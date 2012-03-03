@@ -4,6 +4,8 @@ var url = require('url');
 var path = require('path');
 var util = require('util');
 var fs = require('fs');
+var faye = require('faye');
+var websocket = require('faye-websocket');
 
 var twit = twit || {};
 
@@ -41,14 +43,27 @@ twit.serverListenListener = function(server) {
     console.log('Server is listening on %s:%d', address.address, address.port);
 }
 
-twit.httpServer = http.createServer(function (req, res) {
-    twit.httpRequestListener.call(twit, req, res);
-});
+twit.httpUpgradeListener = function(request, socket, head) {
+    console.log('Upgrade request');
+}
 
-twit.httpServer.on('connection', function(socket) {
-    twit.httpConnectionListener.call(twit, socket);
-});
+// Main:
+function Main() {
+    twit.httpServer = http.createServer(function (req, res) {
+        twit.httpRequestListener.call(twit, req, res);
+    });
 
-twit.httpServer.listen(8080, '127.0.0.1', function() {
-    twit.serverListenListener.call(twit, this);
-});
+    twit.httpServer.on('connection', function(socket) {
+        twit.httpConnectionListener.call(twit, socket);
+    });
+
+    twit.httpServer.on('upgrade', function(request, socket, head) {
+        twit.httpUpgradeListener.call(twit, request, socket, head);
+    });
+
+    twit.httpServer.listen(8080, '127.0.0.1', function() {
+        twit.serverListenListener.call(twit, this);
+    });
+}
+
+Main();

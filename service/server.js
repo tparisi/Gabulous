@@ -5,7 +5,7 @@ var path = require('path');
 var util = require('util');
 var fs = require('fs');
 var faye = require('faye');
-var websocket = require('faye-websocket');
+var WebSocket = require('faye-websocket');
 
 var twit = twit || {};
 
@@ -43,8 +43,32 @@ twit.serverListenListener = function(server) {
     console.log('Server is listening on %s:%d', address.address, address.port);
 }
 
+twit.webSocketOpenListener = function(websocket) {
+    console.log('websocket open');
+}
+
+twit.webSocketMessageListener = function(websocket, event) {
+    console.log('websocket message');
+}
+
+twit.webSocketCloseListener = function(websocket, event) {
+    console.log('websocket close');
+}
+
 twit.httpUpgradeListener = function(request, socket, head) {
     console.log('Upgrade request');
+    var ws = new WebSocket(request, socket, head);
+
+    ws.onopen = function() {
+        twit.webSocketOpenListener.call(twit, ws);
+    }
+    ws.onmessage = function(event) {
+        twit.webSocketMessageListener.call(twit, ws, event);
+    };
+
+    ws.onclose = function(event) {
+        twit.webSocketCloseListener.call(twit, ws, event);
+    }
 }
 
 // Main:

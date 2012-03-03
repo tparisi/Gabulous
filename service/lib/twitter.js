@@ -48,6 +48,9 @@ Twitter.prototype.postAuthCallback = function(req, res, next){
           var twitterData = JSON.parse(data);
           req.session.twitterScreenName = twitterData["screen_name"];
           res.send('You are signed in: ' + req.session.twitterScreenName);
+          res.render('site/authenticated.html', {
+            screenName: twitterData['screen_name']
+          });
         }  
       });
     } 

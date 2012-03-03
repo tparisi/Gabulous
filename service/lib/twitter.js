@@ -1,4 +1,7 @@
 var OAuth= require('oauth').OAuth;
+var oa;
+var _twitterConsumerKey = 'SICgH4FUlyrkEBlm1uMYQ';
+var _twitterConsumerSecret = 'BEB1iJAWNWtHzaYAnGZE6Ploo4512CzUocdxkFSSt8'; 
 
 function Twitter(){
   if(!(this instanceof arguments.callee)){
@@ -6,40 +9,49 @@ function Twitter(){
   } 
 }
 
-Twitter.prototype.authenticate = function(request,response){
+Twitter.prototype.authenticate = function(req,res){
   console.log('ABOUT TO AUTHENTICATE');
-  var oa = new OAuth(
+  oa = new OAuth(
     "https://api.twitter.com/oauth/request_token",
     "https://api.twitter.com/oauth/access_token",
-    "SICgH4FUlyrkEBlm1uMYQ",
-    "BEB1iJAWNWtHzaYAnGZE6Ploo4512CzUocdxkFSSt8",
-    "1.0",
-    "http://127.0.0.1:8080/auth/twitter/callback",
+    _twitterConsumerKey,
+    _twitterConsumerSecret,
+    "1.0A",
+    "http://localhost:8080/auth/twitter/callback",
     "HMAC-SHA1"
   );
 
-  oa.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
-    if(error){
-      console.log('ERROR',error);
-      response.send('boooohooo, did not work');
+  oa.getOAuthRequestToken(function(error, oauthToken, oauthTokenSecret, results){
+    if (error) {
+      res.send("Error getting OAuth request token : " + sys.inspect(error), 500);
+    } else {  
+      req.session.oauthRequestToken = oauthToken;
+      req.session.oauthRequestTokenSecret = oauthTokenSecret;
+      res.redirect("https://twitter.com/oauth/authorize?oauth_token="+req.session.oauthRequestToken);      
     }
-    request.session.oauth = {};
-    request.session.oauth.token = oauth_token;
-    request.session.oauth.token_secret = oauth_token_secret;
-    console.log('request.session.oauth',request.session.oauth);
-    response.redirect('https://twitter.com/oauth/authenticate?oauth_token='+oauth_token);
   });
 }
 
-Twitter.prototype.postAuthCallback = function(request, response, next){
-  console.log('INSIDE POSTAUTHCALLBACK');
-  console.log('request.session',request.session);
-  console.log('request.session.oauth',request.session.oauth);
-  // if (request.session.oauth) {
-
-  // } else {
-  //   next(new Error("you're not supposed to be here."))
-  // }
+Twitter.prototype.postAuthCallback = function(req, res, next){
+  oa.getOAuthAccessToken(req.session.oauthRequestToken, req.session.oauthRequestTokenSecret, req.query.oauth_verifier, function(error, oauthAccessToken, oauthAccessTokenSecret, results) {
+    if(error){
+      console.log('boooooooo');
+      console.log('error is: ', error);
+    } else {
+    req.session.oauthAccessToken = oauthAccessToken;
+      req.session.oauthAccessTokenSecret = oauthAccessTokenSecret;
+      // Right here is where we would write out some nice user stuff
+      oa.get("http://twitter.com/account/verify_credentials.json", req.session.oauthAccessToken, req.session.oauthAccessTokenSecret, function (error, data, response) {
+        if (error) {
+          res.send("Error getting twitter screen name : " + sys.inspect(error), 500);
+        } else {
+          var twitterData = JSON.parse(data);
+          req.session.twitterScreenName = twitterData["screen_name"];
+          res.send('You are signed in: ' + req.session.twitterScreenName);
+        }  
+      });
+    } 
+  });
 };
 
 module.exports = Twitter;

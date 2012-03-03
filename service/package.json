@@ -5,6 +5,7 @@
 	"dependencies" : {
 		"mime" : "1.2.5",
 		"faye" : "0.8.0",
-    "faye-websocket": "0.4.1"
+		"faye-websocket": "0.4.1",
+		"express" : "2.5.8"
 	}
 }

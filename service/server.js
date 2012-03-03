@@ -6,6 +6,7 @@ var util = require('util');
 var fs = require('fs');
 var faye = require('faye');
 var WebSocket = require('faye-websocket');
+var Twitter = require('./lib/twitter.js');
 
 var twit = twit || {};
 
@@ -13,6 +14,13 @@ twit.httpRequestListener = function(request, response) {
     var uri = url.parse(request.url).pathname;
     if (uri == "/") {
         uri = "/index.html";
+    }
+    if (uri == '/auth/twitter'){
+      var twtr = new Twitter();
+      twtr.authenticate(request, response);
+    }
+    if (uri == '/auth/twitter/callback'){
+      console.log('AUTH/TWITTER/CALLBACK YES!');
     }
     var fileName = path.join(process.cwd(), uri);
     var fileType = mime.lookup(fileName);
@@ -88,6 +96,7 @@ function Main() {
     twit.httpServer.listen(8080, '127.0.0.1', function() {
         twit.serverListenListener.call(twit, this);
     });
+
 }
 
 Main();

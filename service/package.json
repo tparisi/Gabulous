@@ -1,0 +1,8 @@
+{
+	"name" : "GabulousService",
+	"version" : "0.1.0",
+	"engine" : "node >= 0.6.11",
+	"dependencies" : {
+		"mime" : "1.2.5"
+	}
+}

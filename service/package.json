@@ -4,6 +4,7 @@
 	"engine" : "node >= 0.6.11",
 	"dependencies" : {
 		"mime" : "1.2.5",
-		"faye" : "0.8.0"
+		"faye" : "0.8.0",
+    "faye-websocket": "0.4.1"
 	}
 }

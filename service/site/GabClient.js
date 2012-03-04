@@ -1,5 +1,6 @@
 function GabClient(twitterId) {
     this.yourTwitterId = twitterId;
+    this.spawned = false;
     this.cache = {};
     this.cache.position = {};
     this.cache.position.x = 0.0;
@@ -9,6 +10,10 @@ function GabClient(twitterId) {
     this.cache.orientation.pitch = 0.0;
     this.cache.orientation.yaw = 0.0;
     this.cache.orientation.roll = 0.0;
+}
+
+GabClient.prototype.selfSpawnEvent = function(twitterId, message) {
+    console.log('override selfSpawnEvent');
 }
 
 GabClient.prototype.positionChangeEvent = function(twitterId, message) {
@@ -23,10 +28,18 @@ GabClient.prototype.actionEvent = function(twitterId, message) {
     console.log('override actionEvent');
 }
 
+GabClient.prototype.Spawned = function() {
+    this.spawned = true;
+    msgPathAction = '/gab/' + this.yourTwitterId + '/action';
+    this.client.subscribe(msgPathAction, function gs_self_action_message(message) {
+        me._messageListener(msgPathAction, message);
+    });
+}
+
 GabClient.prototype._messageListener = function(path, message) {
-    pathChunks = path.split('/');
-    messageTarget = pathChunks[1];
-    messageType = pathChunks[2];
+    var pathChunks = path.split('/');
+    var messageTarget = pathChunks[2];
+    var messageType = pathChunks[3];
     switch (messageType) {
         case 'position_update':
             this.positionChangeEvent(messageTarget, message);
@@ -36,6 +49,10 @@ GabClient.prototype._messageListener = function(path, message) {
             break;
         case 'action':
             this.actionEvent(messageTarget, message);
+            break;
+        case 'selfspawn':
+            this.Spawned();
+            this.selfSpawnEvent(messageTarget, message);
             break;
         default:
             alert('Got Gab message of unknown type' + messageType + ' from ' + message.senderTwitterId);
@@ -52,33 +69,46 @@ GabClient.prototype.connect = function() {
 
 GabClient.prototype.connectListener = function() {
     // Subscribe to actions that target yourTwitterId
-    var msgPath = '/gab/' + this.yourTwitterId + '/action';
-    this.client.subscribe(msgPath, function gs_self_action_message(message) {
-        this._messageListener(msgPath, message);
+    var me = this;
+    var msgPathSelfspawn = '/gab/' + this.yourTwitterId + '/selfspawn';
+    this.client.subscribe(msgPathSelfspawn, function gs_self_selfspawn_message(message) {
+        me._messageListener(msgPathSelfspawn, message);
     });
 }
 
 GabClient.prototype.subscribeToUser = function(twitterId) {
+    if (this.spawned === false) {
+        return false;
+    }
     // Subscribe to users action trigger
+    var me = this;
     var msgPathAction = '/gab/' + twitterId + '/action';
     this.client.subscribe(msgPathAction, function gs_other_action_message(message) {
-        this._messageListener(msgPathAction, message);
+        me._messageListener(msgPathAction, message);
     });
 
     // Subscribe to users position update
     var msgPathPosition = '/gab/' + twitterId + '/position_update';
     this.client.subscribe(msgPathPosition, function gs_other_action_message(message) {
-        this._messageListener(msgPathPosition, message);
+        me._messageListener(msgPathPosition, message);
     });
 
     // Subscribe to users orientation update
     var msgPathOrientation = '/gab/' + twitterId + '/orientation_update';
     this.client.subscribe(msgPathOrientation, function gs_other_action_message(message) {
-        this._messageListener(msgPathOrientation, message);
+        me._messageListener(msgPathOrientation, message);
     });
+
+    // Request spawn information for user
+    this.client.publish('/gab/' + this.yourTwitterId + '/spawn_positions', { users: [twitterId] });
+
+    return true;
 }
 
 GabClient.prototype.updatePosition = function(x,y,z) {
+    if (this.spawned === false) {
+        return false;
+    }
     // Only send if position changed
     if (this.cache.position.x != x ||
         this.cache.position.y != y ||
@@ -87,15 +117,18 @@ GabClient.prototype.updatePosition = function(x,y,z) {
         this.cache.position.x = x;
         this.cache.position.y = y;
         this.cache.position.z = z;
-        message = {};
+        var message = {};
         message.senderTwitterId = this.yourTwitterId;
         message.senderClientId = this.client.getClientId();
         message.position = this.cache.position;
         this.client.publish('/gab/' + this.yourTwitterId + '/position_update', message);
     }
-
+    return true;
 }
 GabClient.prototype.updateOrientation = function(pitch,yaw,roll) {
+    if (this.spawned === false) {
+        return false;
+    }
     if (this.cache.orientation.pitch != pitch ||
         this.cache.orientation.yaw != yaw ||
         this.cache.orientation.roll != roll) {
@@ -103,15 +136,23 @@ GabClient.prototype.updateOrientation = function(pitch,yaw,roll) {
         this.cache.orientation.pitch = pitch;
         this.cache.orientation.yaw = yaw;
         this.cache.orientation.roll = roll;
-        message = {};
+        var message = {};
         message.senderTwitterId = this.yourTwitterId;
         message.senderClientId = this.client.getClientId();
         message.orientation = this.cache.orientation;
         this.client.publish('/gab/' + this.yourTwitterId + '/orientation_update', message);
     }
+    return true;
 }
 
 GabClient.prototype.sendActionToUser = function(twitterId, action) {
-    action.senderTwitterId = this.yourTwitterId;
-    this.client.publish('/gab/' + twitterId + '/action', action);
+    if (this.spawned === false) {
+        return false;
+    }
+    var message = {};
+    message.action = action;
+    message.senderTwitterId = this.yourTwitterId;
+    message.senderClientId = this.client.getClientId();
+    this.client.publish('/gab/' + twitterId + '/action', message);
+    return true;
 }

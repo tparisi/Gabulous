@@ -49,7 +49,7 @@ Twitter.prototype.postAuthCallback = function(req, res, next){
           var twitterData = JSON.parse(data);
           req.session.twitterScreenName = twitterData["screen_name"];
           console.log('req.session',req.session);
-          res.cookie('glabulous', 'yes', { expires: 0, httpOnly: true });
+          res.cookie('twitterUserName', twitterData['screen_name'], { expires: 0, httpOnly: true });
           res.render('authenticated', {
             screenName: twitterData['screen_name']
           });

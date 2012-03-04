@@ -1,3 +1,7 @@
+body {
+  background: #000;
+  color: #fff;
+}
 #twitter_button {
   display: block;
   height: 70px;
@@ -10,4 +14,41 @@
   width: 98%;
   height: 80%;
   position: absolute;
+}
+.annotation {
+  color: #000;
+}
+#twitter_input {
+  position: absolute;
+  background: #9cf;
+  top: 20px;
+  right: 40px;
+  z-index: 1;
+  width: 400px;
+  height: 200px;
+  border: 5px solid #fff;
+  border-radius: 5px;
+  padding: 20px;
+}
+#twitter_input #twitter_profile_pic {
+  height: 48px;
+  width: 48px;
+  border-radius: 5px;
+  border: 4px solid #fff;
+}
+footer {
+  border: 1px solid #f00;
+  height: 50px;
+  position: absolute;
+  bottom: 0;
+  width: 98%;
+}
+footer li {
+  list-style-type: none;
+  margin-right: 10px;
+  float: left;
+  color: #fff;
+}
+footer li a {
+  color: inherit;
 }

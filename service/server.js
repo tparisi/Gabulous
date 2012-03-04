@@ -34,7 +34,7 @@ function Main() {
     twit.gabServer = GabServer.create();
     // Attach it to http server
     twit.gabServer.attachToHttpServer(twit.app);
-    twit.app.listen(8080, '127.0.0.1');
+    twit.app.listen(8080, '10.104.86.106');
     // Root route    
     twit.app.get('/', function(req, res){
       if(req.session.twitterScreenName){

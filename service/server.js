@@ -49,6 +49,12 @@ function Main() {
         });
       }
      });
+
+    // Twitter get_friends route
+    twit.app.get('/get_friends',function(req,res){
+      twitter.getUserFriends(req,res);
+    });
+
     // Twitter authentication route
     twit.app.get('/auth/twitter',function(req,res){
       twitter.authenticate(req,res);

@@ -12,14 +12,12 @@ Gabulous = {
 	
 	userTimelineCallback:function(data)
 	{
-		console.log("in userTimelineCallback, data = ", data);
-		this.timelineData = data;
+		// console.log("in userTimelineCallback, data = ", data);
 	},
 	
 	userFriendsCallback:function(data)
 	{
-		console.log("in userFriendsCallback, data = ", data);
-		this.friendsData = data;
+    console.log("in userFriendsCallback, data = ", data);
 	},
 };
 

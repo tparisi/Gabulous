@@ -2458,8 +2458,11 @@ goog.require('SB.PubSub');
  * Creates a new Component.
  * @constructor
  */
-SB.Component = function() {
+SB.Component = function(param) {
     SB.PubSub.call(this);
+	
+	param = param || {};
+	this.param = param;
     
     /**
      * @type {SB.Entity}
@@ -2691,22 +2694,20 @@ goog.require('SB.Component');
 /**
  * @constructor
  */
-SB.SceneComponent = function(param) {
-	
-	SB.Component.call(this);
-	
-    param = param || {};
+SB.SceneComponent = function(param)
+{	
+	SB.Component.call(this, param);
     
     this.object = null;
-    this.position = param.position || new THREE.Vector3();
-    this.rotation = param.rotation || new THREE.Vector3();
-    this.scale = param.scale || new THREE.Vector3(1, 1, 1);	            
+    this.position = this.param.position || new THREE.Vector3();
+    this.rotation = this.param.rotation || new THREE.Vector3();
+    this.scale = this.param.scale || new THREE.Vector3(1, 1, 1);
 } ;
 
 goog.inherits(SB.SceneComponent, SB.Component);
 
-SB.SceneComponent.prototype.update = function() {
-	
+SB.SceneComponent.prototype.update = function()
+{	
 	SB.Component.prototype.update.call(this);
 	
 	if (this.object)
@@ -2871,12 +2872,47 @@ goog.provide('SB.Visual');
 goog.require('SB.SceneComponent');
 
 /**
+ * Enum for different material types.
+ * @enum {number}
+ */
+SB.MaterialType = {
+	Shader: 0,
+	Phong: 1,
+	Basic: 2
+} ;
+
+/**
  * @constructor
  */
-SB.Visual = function(param) {
+SB.Visual = function(param)
+{
+	SB.SceneComponent.call(this, param);	
+} ;
+
+/**
+ * 
+ */
+SB.Visual.realizeMaterial = function(param)
+{
+	if (param.materialType === null)
+	{
+		param.materialType = SB.MaterialType.Basic;
+		
+		param.materialParam = {
+			color: 0x262624,
+			wireframe: false
+		} ;
+	}
 	
-	SB.SceneComponent.call(this);
-	
+	switch (param.materialType)
+	{
+		case SB.MaterialType.Shader:
+			return new THREE.ShaderMaterial(param.materialParam);
+		case SB.MaterialType.Phong:
+			return new THREE.MeshPhongMaterial(param.materialParam);
+		default:
+			return new THREE.MeshBasicMaterial(param.materialParam);
+	} ;
 } ;
 
 goog.inherits(SB.Visual, SB.SceneComponent);
@@ -2891,7 +2927,8 @@ goog.require('SB.Visual');
  * @constructor
  * @extends {SB.Visual}
  */
-SB.Model = function(param) {
+SB.Model = function(param)
+{
     SB.Visual.call(this, param);
 
 	this.frame = 0;
@@ -2945,7 +2982,10 @@ SB.Model.loadModel = function(url, param)
 			modelClass = SB.ColladaModel;
 			loaderClass = THREE.ColladaLoader;
 			break;
-		
+		case 'JS' :
+			modelClass = SB.JsonModel;
+			loaderClass = THREE.JSONLoader;
+			break;
 		default :
 			break;
 	}
@@ -4030,6 +4070,30 @@ SB.Dragger.prototype.update = function()
     this.lasty = this.y;
 }
 /**
+ * @fileoverview A visual containing a model in JSON format
+ * @author Don Olmstead
+ */
+goog.provide('SB.JsonModel');
+goog.require('SB.Model');
+ 
+/**
+ * @constructor
+ * @extends {SB.Model}
+ */
+SB.JsonModel = function(param)
+{
+	SB.Model.call(this, param);
+}
+
+goog.inherits(SB.JsonModel, SB.Model);
+	       
+SB.JsonModel.prototype.handleLoaded = function(data)
+{
+	this.object = new THREE.Mesh(data, SB.Visual.realizeMaterial(this.param));
+	
+	this.addToScene();
+}
+/**
  * @fileoverview Timer - component that generates time events
  * 
  * @author Tony Parisi
@@ -4118,24 +4182,14 @@ SB.CylinderVisual.prototype.realize = function()
     var segmentsRadius = this.param.segmentsRadius || 100;
     var segmentsHeight = this.param.segmentsHeight || 100;
     var openEnded = this.param.openEnded || false;
-    var color;
-    if (this.param.color === null)
-    {
-    	color = 0x262624;
-    }
-    else
-    {
-    	color = this.param.color;
-    }
     
     var ambient = this.param.ambient || 0;
     
 	var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, segmentsRadius, segmentsHeight, openEnded);
-	this.object = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial( { color: color, opacity: 1, ambient: ambient, transparent: false, wireframe: false } ));
+	this.object = new THREE.Mesh(geometry, SB.Visual.realizeMaterial(this.param));
 	
     this.addToScene();
 }
-
 /**
  * @fileoverview FSM - Finite State Machine class
  * 
@@ -4211,20 +4265,17 @@ SB.ColladaModel.prototype.update = function()
 	
 	if ( this.skin )
 	{
-
     	var now = Date.now();
     	var deltat = (now - this.startTime) / 1000;
     	var fract = deltat - Math.floor(deltat);
     	this.frame = fract * this.frameRate;
 		
-
 		for ( var i = 0; i < this.skin.morphTargetInfluences.length; i++ )
 		{
 			this.skin.morphTargetInfluences[ i ] = 0;
 		}
 
 		this.skin.morphTargetInfluences[ Math.floor( this.frame ) ] = 1;
-
 	}
 }
 /**
@@ -4631,6 +4682,34 @@ SB.CubeVisual.prototype.realize = function()
     this.addToScene();
 }
 
+goog.provide('SB.Shaders');
+
+SB.Shaders = {} ;
+
+SB.Shaders.ToonShader = function(diffuseUrl, toonUrl)
+{
+	var params = {	
+		uniforms: THREE.UniformsUtils.merge( [
+			THREE.UniformsLib[ "lights" ],
+			
+			{
+			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
+			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
+
+			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
+			"uDiffuseColor" : { type: "c", value: new THREE.Color( 0xFFFFFF ) },
+			"uAmbientColor" : { type: "c", value: new THREE.Color( 0x050505 ) },
+			"uShininess"    : { type: "f", value: 30 }
+			}
+
+		] ),
+
+		vertexShader: document.getElementById('toonVertexShader').textContent,
+		fragmentShader: document.getElementById('toonFragmentShader').textContent
+	} ;
+	
+	return params;
+} ;
 /**
  * @fileoverview General-purpose key frame animation
  * @author Tony Parisi
@@ -5005,6 +5084,25 @@ SB.Zoomer.prototype.update = function()
         this.oldScale.z = this.scale.z;
     }
 }
+goog.provide('SB.LightComponent');
+goog.require('SB.SceneComponent');
+
+SB.LightComponent = function(param)
+{
+	SB.SceneComponent.call(this, param);
+}
+
+goog.inherits(SB.LightComponent, SB.SceneComponent);
+
+SB.LightComponent.prototype.realize = function()
+{
+	SB.SceneComponent.prototype.realize.call(this);
+	
+	this.object = new THREE.DirectionalLight(0xffffff);
+    this.object.position.set(1, 0, 0).normalize();
+	
+	this.addToScene();
+}
 /**
  * @fileoverview File Manager - load game assets using Ajax
  * 
@@ -5056,6 +5154,7 @@ goog.require('SB.Popup');
 goog.require('SB.View');
 goog.require('SB.Viewer');
 goog.require('SB.ColladaModel');
+goog.require('SB.JsonModel');
 goog.require('SB.CubeVisual');
 goog.require('SB.CylinderVisual');
 goog.require('SB.Grid');
@@ -5063,6 +5162,8 @@ goog.require('SB.Model');
 goog.require('SB.Pane');
 goog.require('SB.Visual');
 
+goog.require('SB.Shaders');
+goog.require('SB.LightComponent');
 
 /**
  * @constructor

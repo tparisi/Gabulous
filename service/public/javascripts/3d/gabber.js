@@ -3,9 +3,21 @@ Gabber = function(param)
 	SB.Entity.call(this, param);
 	
 	this.transform = new SB.Transform();
-	this.model = new SB.Model.loadModel('../../models/monster.dae');
-	this.model.scale.x = this.model.scale.y = this.model.scale.z = 0.002;
-	this.model.rotation.x = -Math.PI/2;
+
+    // Create the params
+    var params = {
+            materialType: SB.MaterialType.FromFile,
+            //materialParam: {color: 0x00ff00, shading: THREE.SmoothShading }
+            materialParam: {color: 0x00ff00 },
+    } ;
+
+    var url = '../../models/body_hero_nopane.js';
+    this.body = SB.Model.loadModel(url, params);
+	url = '../../models/avatar_display.js';
+    this.display = SB.Model.loadModel(url, params);
+    url = '../../models/avatar_frame.js';
+    this.displayFrame = SB.Model.loadModel(url, params);
+
 	this.picker = new SB.Picker();
 	this.rotator = new SB.Rotator();
 	this.dragger = new SB.Dragger();
@@ -13,10 +25,12 @@ Gabber = function(param)
 	this.mover = new SB.KeyFrame({ loop : false, easeOut : true });
 	this.spinner = new SB.KeyFrame({ loop : true, easeOut : false });
 	this.timer = new SB.Timer( { duration : 3333 } );
-	this.screenTracker = new SB.ScreenTracker( { referencePosition : new THREE.Vector3(0, 3.667, 0) });
+	this.screenTracker = new SB.ScreenTracker( { referencePosition : new THREE.Vector3(1, 3.667, 0) });
 	
 	this.addComponent(this.transform);
-	this.addComponent(this.model);
+	this.addComponent(this.body);
+	this.addComponent(this.display);
+	this.addComponent(this.displayFrame);
 	this.addComponent(this.picker);
 	this.addComponent(this.rotator);
 	this.addComponent(this.dragger);
@@ -63,7 +77,6 @@ Gabber.prototype.realize = function()
 {
 	SB.Entity.prototype.realize.call(this);
 	this.screenTracker.start();
-	this.model.animate(true);
 }
 
 Gabber.prototype.onMouseOver = function(x, y)
@@ -265,6 +278,14 @@ Gabber.prototype.turn = function(direction)
 	this.transform.rotation.y += delta;
 //	var delta = direction * this.turnFraction * (Math.PI * 2); // .0333;
 //	this.transform.rotation.y = delta; // += delta;
+}
+
+Gabber.prototype.setUserInfo = function(data) 
+{
+	var userText = "<div><img src='" + data.profile_image_url + "' width='37' height='37'/>" + 
+	"<div style='position:absolute; top:4px; left: 48px;'> <b> " 
+	+ data.name + "</b> @" + data.screen_name + "</div></div>";
+	this.annotation.setHTML(userText);
 }
 
 Gabber.prototype.onScreenPositionChanged = function(pos)

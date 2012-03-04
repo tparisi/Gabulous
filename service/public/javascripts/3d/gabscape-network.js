@@ -54,9 +54,6 @@ Gabscape.prototype.initEntities = function()
 	this.timer.subscribe("fraction", this, this.onTimeFractionChanged);
 	this.timer.start();
 	
-	var grid = new SB.Grid({size:64});
-	this.root.addComponent(grid);
-	
 	this.initModels();
 
     this.gabbers = [];
@@ -68,6 +65,9 @@ Gabscape.prototype.initEntities = function()
         }
         var g1 = new Gabber({name: Gabscape.users[i]});
         g1.name = Gabscape.users[i];
+        g1.network = g1.network || {};
+        g1.network.orientationInterpolationTime = 0.0;
+        g1.network.positionInterpolationTime = 0.0;
         g1.transform.position.set(0, 0, 0);
         this.gabbers.push(g1);
     }
@@ -89,6 +89,8 @@ Gabscape.prototype.initEntities = function()
 	this.root.realize();
 	
 	this.viewer.viewpoint.camera.bind();
+	
+	this.initSound();
 }
 
 Gabscape.prototype.createViewer = function()
@@ -101,31 +103,73 @@ Gabscape.prototype.createViewer = function()
 
 Gabscape.prototype.createNetwork = function()
 {
-
 	this.network = new Gabscape_GabClient(Gabscape.user, this);
 	this.network.connect();
 	this.lastNetworkUpdateTime = 0;
+    this.lastTweenUpdateTime = 0;
 }
 
 Gabscape.prototype.initModels = function()
 {
 	var modelpath = '../../models/';
 	
-	this.initModel(modelpath + 'trees01_rescaled.js', -50, 0, 0);
-	this.initModel(modelpath + 'trees01_rescaled.js', 50, 0, 0);
-	this.initModel(modelpath + 'trees01_rescaled.js', 50, 0, 50);
-	this.initModel(modelpath + 'trees_conf01_rescaled.js', -5, 0, -50);
-	this.initModel(modelpath + 'cloud01_rescaled.js', -20, 20, -50);
-	this.initModel(modelpath + 'moon01_rescaled.js', -50, 60, -50);
-	this.initModel(modelpath + 'body_base_nopane.js', -10, 0, -10);
-	this.initModel(modelpath + 'body_flying_nopane.js', 10, 0, 10);
-	this.initModel(modelpath + 'body_flying2_nopane.js', 10, 0, -10);
-	this.initModel(modelpath + 'body_hero_nopane.js', -10, 0, 10);
-	this.initModel(modelpath + 'body_inactive_nopane.js', 0, 0, -15); 
-	this.initModel(modelpath + 'failwhale.js', 30, 20, -20); 
+	  this.initModel(modelpath + 'flatland01.js', 0, -2, 0, 0);
+		this.initModel(modelpath + 'trees01_rescaled.js', 15, 0, 15, 0.3);
+		this.initModel(modelpath + 'trees01_rescaled.js', -15, 1, 15, 0.2 );
+		this.initModel(modelpath + 'trees01_rescaled.js', 15, 0, -15, 0.5 );
+	  this.initModel(modelpath + 'trees01_rescaled.js', -15, 0, -15, 0,7 );
+		this.initModel(modelpath + 'trees01_rescaled.js', 13, 0, 7, -0.3 );
+		this.initModel(modelpath + 'trees01_rescaled.js', -13, 0, 7, -0.5 );
+		this.initModel(modelpath + 'trees01_rescaled.js', 7, 0, 13, -0.7 );
+	  this.initModel(modelpath + 'trees01_rescaled.js', 7, 0, -13, -0.9 ); 
+	  
+	  this.initModel(modelpath + 'flatland01.js', 0, -2, 0, 1 );
+		this.initModel(modelpath + 'trees01_rescaled.js', 8, 0, 9, 2 );
+		this.initModel(modelpath + 'trees01_rescaled.js', -8, 1, 9, 3 );
+		this.initModel(modelpath + 'trees01_rescaled.js', 8, 0, -9, 4 );
+	  this.initModel(modelpath + 'trees01_rescaled.js', -8, 0, -9, 5 );
+	  
+		this.initModel(modelpath + 'trees01_rescaled.js', 11, 0, 10, -1 );
+		this.initModel(modelpath + 'trees01_rescaled.js', -11, 0, 10, -2 );
+		this.initModel(modelpath + 'trees01_rescaled.js', 11, 0, -10, -3);
+	  this.initModel(modelpath + 'trees01_rescaled.js', 11, 0, -10, -4 ); 
+	  
+		this.initModel(modelpath + 'trees_conf01_rescaled.js', 12, 0, 0, 1 );
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', -12, 0, 0, 2 );
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', 0, 0, 12, 3);
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', 0, 0, -12, 4 );
+	  
+		this.initModel(modelpath + 'trees_conf01_rescaled.js', 15, 0, -5, -1 );
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', -15, 0, -5, -2 );
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', 5, 0, 15, -3 );
+	  this.initModel(modelpath + 'trees_conf01_rescaled.js', -5, 0, -15, -4 );  
+	  
+		this.initModel(modelpath + 'cloud01_rescaled.js', -20, 8, -20, 1 );
+	  this.initModel(modelpath + 'cloud01_rescaled.js', 20, 9, -20, 2 );
+	  this.initModel(modelpath + 'cloud01_rescaled.js', -20, 10, 20, 3 );
+	  this.initModel(modelpath + 'cloud01_rescaled.js', 20, 11, 20, 4 );
+	  
+	  this.initModel(modelpath + 'cloud01_rescaled.js', 15, 8, 0, -1 );
+	  this.initModel(modelpath + 'cloud01_rescaled.js', -15, 9, 0, -2 );
+	  this.initModel(modelpath + 'cloud01_rescaled.js', 0, 10, 16, -3 );
+	  this.initModel(modelpath + 'cloud01_rescaled.js', 0, 11, -16, -4 );
+	  
+		this.initModel(modelpath + 'mountan01.js', -48, 0, 0, 1 );
+	  this.initModel(modelpath + 'mountan01.js', 49, 0, -0, 2 );
+	  this.initModel(modelpath + 'mountan01.js', 3, 0, -45, 3 );
+	  this.initModel(modelpath + 'mountan01.js', -1, 0, 43, 0 );  
+	  
+		this.initModel(modelpath + 'moon01_rescaled.js', -50, 60, -50, 0 );
+		this.initModel(modelpath + 'body_base_nopane.js', -10, 0, -10, 0 );
+		this.initModel(modelpath + 'body_flying_nopane.js', 10, 0, 10, 0 );
+		this.initModel(modelpath + 'body_flying2_nopane.js', 10, 0, -10, 0 );
+		this.initModel(modelpath + 'body_hero_nopane.js', -10, 0, 10, 0 );
+		this.initModel(modelpath + 'body_inactive_nopane.js', 0, 0, -15, 0 ); 
+		this.initModel(modelpath + 'failwhale.js', 20, 1.5, -25, 0); 
+	  this.initModel(modelpath + 'bird.js', 30, 6, 30, -1); 
 }
 
-Gabscape.prototype.initModel = function(url, x, y, z)
+Gabscape.prototype.initModel = function(url, x, y, z, ry)
 {
        var entity = new SB.Entity();
 
@@ -133,6 +177,7 @@ Gabscape.prototype.initModel = function(url, x, y, z)
 	   transform.position.x = x;
 	   transform.position.y = y;
 	   transform.position.z = z;
+     transform.rotation.y = ry;
 	   entity.addComponent(transform);
 	   entity.transform = transform;
 
@@ -151,7 +196,44 @@ Gabscape.prototype.initModel = function(url, x, y, z)
 
        this.addEntity(entity);
 }
-				
+
+Gabscape.prototype.initSound = function()
+{
+	sound_init();
+}
+
+Gabscape.prototype.getTwitterData = function()
+{
+	var that = this;
+
+	TWITTER_CLIENT.getUserData(function(data) { that.getUserCallback(data); });
+	TWITTER_CLIENT.getUserTimeLine(function(data) { that.userTimelineCallback(data); });
+	TWITTER_CLIENT.getUserFriends(function(data) { that.userFriendsCallback(data); });
+
+}
+
+Gabscape.prototype.getUserCallback = function(data)
+{
+	var userInfo = data[0];
+	this.gabatar.setUserInfo(userInfo);
+}
+
+Gabscape.prototype.userTimelineCallback = function(data)
+{
+	var foo = data;
+}
+
+Gabscape.prototype.userFriendsCallback = function(data)
+{
+	var i, len = data.length;
+	for (i = 0; i < len; i++)
+	{
+		if (i >= this.gabbers.length)
+			break;
+		
+		this.gabbers[i].setUserInfo(data[i]);
+	}
+}
 Gabscape.prototype.selfSpawnEvent = function(twitterId, message) {
     var x = message.spawnposition.x;
     var y = message.spawnposition.y;
@@ -178,7 +260,19 @@ Gabscape.prototype.positionChangeEvent = function(twitterId, message) {
         console.log('Could not find gabber: ' + twitterId);
         return;
     }
-    gabber.transform.position.set(message.position.x, message.position.y, message.position.z);
+    gabber.network = gabber.network || {};
+    if (gabber.network.positionTarget === undefined) {
+        // First time, take position
+        gabber.transform.position.set(message.position.x, message.position.y, message.position.z);
+    } else {
+        // Jump to last network position
+        // If we are interpolate quick enough, we shouldn't notice this.
+        gabber.transform.position.set(gabber.network.positionTarget.x, gabber.network.positionTarget.y, gabber.network.positionTarget.z);
+    }
+    // Start interpolation
+    gabber.network.positionSource = gabber.transform.position;
+    gabber.network.positionTarget = message.position;
+    gabber.network.positionInterpolationTime = 0.0;
 }
 
 Gabscape.prototype.orientationChangeEvent = function(twitterId, message) {
@@ -189,17 +283,77 @@ Gabscape.prototype.orientationChangeEvent = function(twitterId, message) {
         console.log('Could not find gabber: ' + twitterId);
         return;
     }
-    gabber.transform.rotation.set(message.orientation.pitch, message.orientation.yaw, message.orientation.roll);
+    gabber.network = gabber.network || {};
+    if (gabber.network.orientationTarget === undefined) {
+        // First time, take orientation
+        gabber.transform.rotation.set(message.orientation.pitch, message.orientation.yaw, message.orientation.roll);
+    } else {
+        // Jump to previous network orientation
+        // If we are interpolate quick enough, we shouldn't notice this.
+        gabber.transform.rotation.set(gabber.network.orientationTarget.pitch, gabber.network.orientationTarget.yaw, gabber.network.orientationTarget.roll);
+    }
+    // Start interpolation
+    gabber.network.orientationSource = gabber.transform.rotation;
+    gabber.network.orientationTarget = message.orientation;
+    gabber.network.orientationInterpolationTime = 0.0;
 }
 
 Gabscape.prototype.actionEvent = function(twitterId, message) {
     console.log('Got actionEvent for ' + twitterId);
 }
 
+function orientationTween(t, source, target) {
+    var x,y,z;
+    x = ((1.0 - t) * source.x) + (t * target.pitch);
+    y = ((1.0 - t) * source.y) + (t * target.yaw);
+    z = ((1.0 - t) * source.z) + (t * target.roll);
+    return {"x": x, "y": y, "z": z};
+}
+
+function positionTween(t, source, target) {
+    var x,y,z;
+    x = ((1.0 - t) * source.x) + (t * target.x);
+    y = ((1.0 - t) * source.y) + (t * target.y);
+    z = ((1.0 - t) * source.z) + (t * target.z);
+    return {"x": x, "y": y, "z": z};
+}
+Gabscape.prototype.updateNetworkPositions = function(t) {
+    var deltat = (t - this.lastTweenUpdateTime)/1000.0;
+    this.lastTweenUpdateTime = t;
+    var i;
+    for (i = 0; i < this.gabbers.length; i++) {
+        var gabber = this.gabbers[i];
+        var gabnet = gabber.network;
+        if (gabnet.positionSource === undefined || gabnet.positionTarget == undefined) {
+            continue;
+        }
+        gabnet.positionInterpolationTime += deltat;
+        if (gabnet.positionInterpolationTime > 1.0) {
+            gabnet.positionInterpolationTime = 1.0;
+        }
+        var pt = positionTween(gabnet.positionInterpolationTime, gabnet.positionSource, gabnet.positionTarget);
+        gabber.transform.position.set(pt.x, pt.y, pt.z);
+    }
+
+    for (i = 0; i < this.gabbers.length; i++) {
+        var gabber = this.gabbers[i];
+        var gabnet = gabber.network;
+        if (gabnet.orientationSource === undefined || gabnet.orientationTarget == undefined) {
+            continue;
+        }
+        gabnet.orientationInterpolationTime += deltat;
+        if (gabnet.orientationInterpolationTime > 1.0) {
+            gabnet.orientationInterpolationTime = 1.0;
+        }
+        var ot = orientationTween(gabnet.orientationInterpolationTime, gabnet.orientationSource, gabnet.orientationTarget);
+        gabber.transform.rotation.set(ot.x, ot.y, ot.z);
+    }
+}
+
 Gabscape.prototype.updateNetwork = function(t) 
 {
 	var deltat = t - this.lastNetworkUpdateTime;
-	if (deltat > 200)
+	if (deltat > Gabscape.networkUpdateThreshold)
 	{
 		var pos = this.viewer.transform.position;
 		this.network.updatePosition(pos.x, pos.y, pos.z);
@@ -479,7 +633,7 @@ Gabscape.prototype.onTimeChanged = function(t)
 			}
 		}
 	}
-	
+	this.updateNetworkPositions(t);
 	this.updateNetwork(t);
 }
 
@@ -493,6 +647,7 @@ Gabscape.prototype.move = function(direction)
 	var delta = direction * .1666;
 	var dir = new THREE.Vector3(0, 0, delta);
 	this.viewer.move(dir);
+	gain2.gain.value = 1;
 }
 
 Gabscape.prototype.turn = function(direction)
@@ -526,5 +681,8 @@ Gabscape.prototype.help = function()
 }
 
 Gabscape.default_display_stats = false;
-Gabscape.users = ["tony", "john", "mark", "don", "theo"];
-Gabscape.user = "tony";
+Gabscape.users = ["auradeluxe", "carrnation", "cyberdino", "don_olmstead", "fromthought2web",
+                  "Gamepsych", "jackpryne", "JohnMcCutchan", "mgpettit", "scottfoe", "ta"];
+
+Gabscape.user = "auradeluxe";
+Gabscape.networkUpdateThreshold = 100;

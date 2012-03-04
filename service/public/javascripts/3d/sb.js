@@ -4075,12 +4075,40 @@ SB.Dragger.prototype.update = function()
     this.lastx = this.x;
     this.lasty = this.y;
 }
+goog.provide('SB.Shaders');
+
+SB.Shaders = {} ;
+
+SB.Shaders.ToonShader = function(diffuseUrl, toonUrl, ambient, diffuse)
+{
+	diffuse = diffuse || new THREE.Color( 0xFFFFFF );
+	ambient = ambient || new THREE.Color( 0x050505 );
+
+	var params = {	
+		uniforms: 
+			{
+			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
+			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
+			"specular": { type: "c", value: new THREE.Color( 0x333333 ) },
+			"diffuse" : { type: "c", value: diffuse },
+			"ambient" : { type: "c", value: ambient },
+			"shininess"    : { type: "f", value: 30 },
+			"ambientLightColor": { type: "c", value: new THREE.Color( 0x888888 ) }
+			},
+
+		vertexShader: document.getElementById('toonVertexShader').textContent,
+		fragmentShader: document.getElementById('toonFragmentShader').textContent
+	} ;
+	
+	return params;
+} ;
 /**
  * @fileoverview A visual containing a model in JSON format
  * @author Don Olmstead
  */
 goog.provide('SB.JsonModel');
 goog.require('SB.Model');
+goog.require('SB.Shaders');
  
 /**
  * @constructor
@@ -4104,7 +4132,20 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 	{
 		material = SB.Visual.realizeMaterial(this.param);
 	}
+
+	// HACK FOR TOON SHADING REMOVE
+	var diffuseTexture = './images/diffuse-tree.png';
+	var toonTexture = './images/toon-lookup.png';
 	
+	for (var i = 0; i < data.materials.length; i++)
+	{
+		var oldMaterial = data.materials[i];
+		
+		var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+		
+		data.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
+	}
+
 	this.object = new THREE.Mesh(data, material);
 	
 	this.addToScene();
@@ -4698,34 +4739,6 @@ SB.CubeVisual.prototype.realize = function()
     this.addToScene();
 }
 
-goog.provide('SB.Shaders');
-
-SB.Shaders = {} ;
-
-SB.Shaders.ToonShader = function(diffuseUrl, toonUrl)
-{
-	var params = {	
-		uniforms: THREE.UniformsUtils.merge( [
-			THREE.UniformsLib[ "lights" ],
-			
-			{
-			"uDiffuseTexture" : { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture(diffuseUrl) },
-			"uToonTexture"    : { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture(toonUrl) },
-
-			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"uDiffuseColor" : { type: "c", value: new THREE.Color( 0xFFFFFF ) },
-			"uAmbientColor" : { type: "c", value: new THREE.Color( 0x050505 ) },
-			"uShininess"    : { type: "f", value: 30 }
-			}
-
-		] ),
-
-		vertexShader: document.getElementById('toonVertexShader').textContent,
-		fragmentShader: document.getElementById('toonFragmentShader').textContent
-	} ;
-	
-	return params;
-} ;
 /**
  * @fileoverview General-purpose key frame animation
  * @author Tony Parisi

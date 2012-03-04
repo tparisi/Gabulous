@@ -7,12 +7,12 @@ Gabulous = {
 	
 	userTimelineCallback:function(data)
 	{
-		console.log("in userTimelineCallback, data = ", data);
+		// console.log("in userTimelineCallback, data = ", data);
 	},
 	
 	userFriendsCallback:function(data)
 	{
-		console.log("in userFriendsCallback, data = ", data);
+		// console.log("in userFriendsCallback, data = ", data);
 	},
 };
 

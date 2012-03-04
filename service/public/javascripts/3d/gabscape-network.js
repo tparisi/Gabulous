@@ -21,7 +21,7 @@ Gabscape.prototype.initialize = function(param)
 	
 	SB.Game.prototype.initialize.call(this, param);
 
-//	this.getTwitterData();
+	this.getTwitterData();
 }
 
 
@@ -361,43 +361,6 @@ Gabscape.prototype.updateNetwork = function(t)
 		this.network.updateOrientation(rot.x, rot.y, rot.z);
 		this.lastNetworkUpdateTime = t;
 	}
-}
-
-Gabscape.prototype.getTwitterData = function()
-{
-	var that = this;
-	Gabulous.getTimeline(function(result, text) 
-			{ that.timelineCallback(result, text); });
-}
-
-Gabscape.prototype.timelineCallback = function(result, responseText)
-{
-	var foo = result;
-	var statusInfo = this.getStatusInfo(result);
-	this.updateStatus(statusInfo);
-	var that = this;
-	Gabulous.getFriends(this.twitterInfo.screen_name, 
-			function(result, text) { that.friendsCallback(result, text); });
-}
-
-Gabscape.prototype.friendsCallback = function(result, responseText)
-{
-	var foo = result;
-	var friendsInfo = this.getFriendsInfo(result);
-	
-	this.updateFriends(friendsInfo);
-
-	var that = this;
-	Gabulous.getPublicTimeline(function(result, text) 
-			{ that.publicTimelineCallback(result, text); });
-}
-
-
-Gabscape.prototype.publicTimelineCallback = function(result, responseText)
-{
-	var foo = result;
-	var statusInfo = this.getStatusInfo(result);
-    this.updatePublicTimeline(statusInfo);
 }
 
 Gabscape.prototype.updateStatus = function(message)

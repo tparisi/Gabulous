@@ -4,10 +4,6 @@ TWITTER_CLIENT = {
   idCollection: null,
   userCollection: [],
   init: function(){
-    // if(this.userName){
-    //   this.getUserTimeLine();
-    //   this.getUserFriends();
-    // }
   },
   getUserData: function(callback){
     var self = this;

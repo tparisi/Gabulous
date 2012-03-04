@@ -31,9 +31,10 @@ Gabulous = {
   },
   postTweet: function(){
     $("form#twitter_input_form").submit(function(){
-      alert('gonna submit!');
+      var status = $('textarea#twitter_input_text').val()
       $.ajax({
-        url: '',
+        url: 'https://api.twitter.com/1/statuses/update.json/status='+status+'&callback=?',
+        // url: 'https://api.twitter.com/1/users/lookup.json?screen_name='+self.userName+'&callback=?',
         type: 'POST',
         success: function(response){
           alert('successfully tweeted!');

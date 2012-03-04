@@ -34,13 +34,21 @@ function Main() {
     twit.gabServer = GabServer.create();
     // Attach it to http server
     twit.gabServer.attachToHttpServer(twit.app);
-    twit.app.listen(8080, '10.104.86.106');
+    twit.app.listen(8080, '127.0.0.1');
     // Root route    
     twit.app.get('/', function(req, res){
-      res.render('index', {
-        title: 'Express'
-      });
-    });
+      if(req.session.twitterScreenName){
+        console.log('req.session',req.session);
+        res.render('authenticated', {
+          title: 'Welcome back!',
+          screenName: req.session.twitterScreenName
+        });
+      } else {
+        res.render('index', {
+          title: 'Welcome to Glabulous!'
+        });
+      }
+     });
     // Twitter authentication route
     twit.app.get('/auth/twitter',function(req,res){
       twitter.authenticate(req,res);

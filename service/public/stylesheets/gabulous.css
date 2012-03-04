@@ -4,3 +4,10 @@
   width: 450px;
   background: url("../images/sign-in-with-twitter.png") no-repeat 0 0;
 }
+#container {
+  overflow: hidden;
+  background-color: #000;
+  width: 98%;
+  height: 80%;
+  position: absolute;
+}

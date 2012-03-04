@@ -15,11 +15,11 @@ TWITTER_CLIENT = {
         callback(data);
       },
       error: function(){
-        alert('WAAA WAAA WAAA - BAD!');
+    	  console.log('getUserTimeLine error');
       }
     })
   },
-  getUserFriends: function(){
+  getUserFriends: function(callback){
     var self = this;
     $.ajax({
       url: 'https://api.twitter.com/1/friends/ids.json?screen_name='+self.userName+'&callback=?',
@@ -27,12 +27,12 @@ TWITTER_CLIENT = {
       timeout: 15000,
       success:function(data){
         console.log('getUserFriends data is ',data);
+        callback(data);
       },
       error: function(){
-        alert('WAAA WAAA WAAA - BAD!');
+    	  console.log('getUserFriends error');
       }
     });
   }
 }
 
-TWITTER_CLIENT.init();

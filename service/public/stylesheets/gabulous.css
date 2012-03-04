@@ -36,3 +36,19 @@ body {
   border-radius: 5px;
   border: 4px solid #fff;
 }
+footer {
+  border: 1px solid #f00;
+  height: 50px;
+  position: absolute;
+  bottom: 0;
+  width: 98%;
+}
+footer li {
+  list-style-type: none;
+  margin-right: 10px;
+  float: left;
+  color: #fff;
+}
+footer li a {
+  color: inherit;
+}

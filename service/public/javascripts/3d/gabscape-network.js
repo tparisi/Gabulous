@@ -98,17 +98,18 @@ Gabscape.prototype.createNetwork = function()
 
 Gabscape.prototype.initModels = function()
 {
-  this.initModel('./models/trees01.js', -100, 0, 0);
-  this.initModel('./models/trees01.js', 100, 0, 0);
-  this.initModel('./models/trees01.js', 100, 0, 100);
-  this.initModel('./models/trees_conf01.js', -100, 0, -100);
-  this.initModel('./models/cloud01.js', -100, 100, -100);
-  this.initModel('./models/moon01.js', -100, 100, -100);
-  this.initModel('./models/body_base_nopane.js', -10, 0, -10);
-  this.initModel('./models/body_flying_nopane.js', 10, 0, 10);
-  this.initModel('./models/body_flying2_nopane.js', 10, 0, -10);
-  this.initModel('./models/body_hero_nopane.js', -10, 0, 10);
-  this.initModel('./models/body_inactive_nopane.js', 0, 0, -15); 
+  this.initModel('../../models/trees01.js', -100, 0, 0);
+  this.initModel('../../models/trees01.js', 100, 0, 0);
+  this.initModel('../../models/trees01.js', 100, 0, 100);
+  this.initModel('../../models/trees_conf01.js', -100, 0, -100);
+  this.initModel('../../models/cloud01_rescaled.js', -40, 60, -100);
+  this.initModel('../../models/moon01_rescaled.js', -100, 100, -100);
+  this.initModel('../../models/body_base_nopane.js', -10, 0, -10);
+  this.initModel('../../models/body_flying_nopane.js', 10, 0, 10);
+  this.initModel('../../models/body_flying2_nopane.js', 10, 0, -10);
+  this.initModel('../../models/body_hero_nopane.js', -10, 0, 10);
+  this.initModel('../../models/body_inactive_nopane.js', 0, 0, -15); 
+  this.initModel('../../models/failwhale.js', 0, 60, -20); 
 }
 
 Gabscape.prototype.initModel = function(url, x, y, z)

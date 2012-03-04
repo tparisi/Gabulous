@@ -4127,12 +4127,15 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 	if (this.param.materialType == SB.MaterialType.FromFile)
 	{
 		material = new THREE.MeshFaceMaterial(); // data.materials ? data.materials[0] : null;
+		if (this.param.map)
+			data.materials[0].map = this.param.map;
 	}
 	else
 	{
 		material = SB.Visual.realizeMaterial(this.param);
 	}
 
+/*
 	// HACK FOR TOON SHADING REMOVE
 	var diffuseTexture = './images/diffuse-tree.png';
 	var toonTexture = './images/toon-lookup.png';
@@ -4145,7 +4148,8 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 		
 		data.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
 	}
-
+*/
+	
 	this.object = new THREE.Mesh(data, material);
 	
 	this.addToScene();

@@ -17,11 +17,8 @@ Gabscape.prototype.initialize = function(param)
 	if (!param.displayStats)
 		param.displayStats = Gabscape.default_display_stats;
 
-	this.twitterInfo = param.info;
-	
 	SB.Game.prototype.initialize.call(this, param);
 
-//	this.getTwitterData();
 }
 
 
@@ -89,6 +86,8 @@ Gabscape.prototype.initEntities = function()
 	this.root.realize();
 	
 	this.viewer.viewpoint.camera.bind();
+	this.getTwitterData();
+	this.initSound();	
 }
 
 Gabscape.prototype.createViewer = function()
@@ -96,7 +95,7 @@ Gabscape.prototype.createViewer = function()
 	this.viewer = new SB.Viewer({ headlight : true });
 	this.gabatar = new Gabatar({ info : this.twitterInfo });
 
-	this.viewer.addChild(this.gabatar);
+	this.viewer.addChild(this.gabatar);	
 }
 
 Gabscape.prototype.createNetwork = function()
@@ -152,6 +151,11 @@ Gabscape.prototype.initModel = function(url, x, y, z)
        this.addEntity(entity);
 }
 				
+Gabscape.prototype.initSound = function()
+{
+	sound_init();
+}
+
 Gabscape.prototype.selfSpawnEvent = function(twitterId, message) {
     var x = message.spawnposition.x;
     var y = message.spawnposition.y;
@@ -212,38 +216,34 @@ Gabscape.prototype.updateNetwork = function(t)
 Gabscape.prototype.getTwitterData = function()
 {
 	var that = this;
-	Gabulous.getTimeline(function(result, text) 
-			{ that.timelineCallback(result, text); });
+
+	TWITTER_CLIENT.getUserData(function(data) { that.getUserCallback(data); });
+	TWITTER_CLIENT.getUserTimeLine(function(data) { that.userTimelineCallback(data); });
+	TWITTER_CLIENT.getUserFriends(function(data) { that.userFriendsCallback(data); });
+
 }
 
-Gabscape.prototype.timelineCallback = function(result, responseText)
+Gabscape.prototype.getUserCallback = function(data)
 {
-	var foo = result;
-	var statusInfo = this.getStatusInfo(result);
-	this.updateStatus(statusInfo);
-	var that = this;
-	Gabulous.getFriends(this.twitterInfo.screen_name, 
-			function(result, text) { that.friendsCallback(result, text); });
+	var userInfo = data[0];
+	this.gabatar.setUserInfo(userInfo);
 }
 
-Gabscape.prototype.friendsCallback = function(result, responseText)
+Gabscape.prototype.userTimelineCallback = function(data)
 {
-	var foo = result;
-	var friendsInfo = this.getFriendsInfo(result);
-	
-	this.updateFriends(friendsInfo);
-
-	var that = this;
-	Gabulous.getPublicTimeline(function(result, text) 
-			{ that.publicTimelineCallback(result, text); });
+	var foo = data;
 }
 
-
-Gabscape.prototype.publicTimelineCallback = function(result, responseText)
+Gabscape.prototype.userFriendsCallback = function(data)
 {
-	var foo = result;
-	var statusInfo = this.getStatusInfo(result);
-    this.updatePublicTimeline(statusInfo);
+	var i, len = data.length;
+	for (i = 0; i < len; i++)
+	{
+		if (i >= this.gabbers.length)
+			break;
+		
+		this.gabbers[i].setUserInfo(data[i]);
+	}
 }
 
 Gabscape.prototype.updateStatus = function(message)
@@ -493,6 +493,7 @@ Gabscape.prototype.move = function(direction)
 	var delta = direction * .1666;
 	var dir = new THREE.Vector3(0, 0, delta);
 	this.viewer.move(dir);
+	gain2.gain.value = 1;
 }
 
 Gabscape.prototype.turn = function(direction)

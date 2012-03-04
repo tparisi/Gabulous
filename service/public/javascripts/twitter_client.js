@@ -4,10 +4,23 @@ TWITTER_CLIENT = {
   idCollection: null,
   userCollection: [],
   init: function(){
-    if(this.userName){
-      this.getUserTimeLine();
-      this.getUserFriends();
-    }
+    // if(this.userName){
+    //   this.getUserTimeLine();
+    //   this.getUserFriends();
+    // }
+  },
+  getUserData: function(callback){
+    var self = this;
+    $.ajax({
+      url: 'https://api.twitter.com/1/users/lookup.json?screen_name='+self.userName+'&callback=?',
+      dataType: 'json',
+      success: function(data){
+        callback(data);
+      },
+      error: function(){
+
+      }
+    });
   },
   getUserTimeLine: function(callback){
     var self = this;

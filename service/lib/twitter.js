@@ -45,10 +45,11 @@ Twitter.prototype.postAuthCallback = function(req, res, next){
         if (error) {
           res.send("Error getting twitter screen name : " + sys.inspect(error), 500);
         } else {
+          console.log('ABOUT TO SEND!!!!');
           var twitterData = JSON.parse(data);
           req.session.twitterScreenName = twitterData["screen_name"];
-          res.send('You are signed in: ' + req.session.twitterScreenName);
-          res.render('site/authenticated.html', {
+          // res.send('You are signed in: ' + req.session.twitterScreenName);
+          res.render('authenticated', {
             screenName: twitterData['screen_name']
           });
         }  

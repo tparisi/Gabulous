@@ -20,6 +20,9 @@
 .annotation {
   color: #000;
 }
+#user-name {
+  visibility: hidden;
+}
 #twitter_input {
   position: absolute;
   background: #9cf;
@@ -27,12 +30,17 @@
   right: 40px;
   z-index: 1;
   width: 400px;
-  height: 200px;
+  height: 60px;
   border: 5px solid #808080;
   border-radius: 5px;
   padding: 20px;
 }
+#twitter_input textarea {
+  width: 300px;
+}
 #twitter_input #twitter_profile_pic {
+  margin-right: 10px;
+  float: left;
   height: 48px;
   width: 48px;
   border-radius: 5px;

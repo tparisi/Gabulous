@@ -1,4 +1,8 @@
 var OAuth= require('oauth').OAuth;
+var url  = require('url');
+var http = require('http');
+var twtr = require('twitter');
+var https = require('https')
 var oa;
 var _twitterConsumerKey = 'SICgH4FUlyrkEBlm1uMYQ';
 var _twitterConsumerSecret = 'BEB1iJAWNWtHzaYAnGZE6Ploo4512CzUocdxkFSSt8'; 
@@ -45,7 +49,6 @@ Twitter.prototype.postAuthCallback = function(req, res, next){
         if (error) {
           res.send("Error getting twitter screen name : " + sys.inspect(error), 500);
         } else {
-          console.log('ABOUT TO SEND!!!!');
           var twitterData = JSON.parse(data);
           req.session.twitterScreenName = twitterData["screen_name"];
           console.log('req.session',req.session);
@@ -57,6 +60,51 @@ Twitter.prototype.postAuthCallback = function(req, res, next){
       });
     } 
   });
+};
+
+Twitter.prototype.getUserFriends = function(req,res){
+  console.log('inside server getUserFriends');
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
+  var screenName = query['screen_name'];
+  var friends = [];
+  
+  var options = {
+      host: 'api.twitter.com',
+      path: '/1/friends/ids.json?screen_name=fromthought2web',
+      // port : '443',
+      method: 'GET'
+  };
+
+  console.log('about to call twitter api');
+
+  var req = https.request(options, function(res) {
+      console.log('---- inside request ----');
+      // console.log('STATUS: ' + res.statusCode);
+      // res.setEncoding('utf8');
+      // res.on('data', function (chunk) {
+      //     console.log('BODY: ' + chunk);
+      // });
+  });
+  
+
+
+  // var twit = new twtr({
+  //     consumer_key: _twitterConsumerKey,
+  //     consumer_secret: _twitterConsumerSecret,
+  //     access_token_key: req.session.oauthAccessToken,
+  //     access_token_secret: req.session.oauthAccessTokenSecret  
+  // });
+   
+  // // console.log('twit',twit);
+  
+  // twit.get('https://api.twitter.com/1/friends/ids.json?screen_name=fromthought2web', {callback: "&#063;"}, function(data) {
+  //     // sys.puts(sys.inspect(data));
+  //   console.log('data after twit.get',data);
+  // });
+  
+
+  res.send(friends);
 };
 
 module.exports = Twitter;

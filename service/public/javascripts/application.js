@@ -8,6 +8,7 @@ Gabulous = {
         game.run();
 		TWITTER_CLIENT.getUserTimeLine(that.userTimelineCallback);
 		TWITTER_CLIENT.getUserFriends(that.userFriendsCallback);
+    TWITTER_CLIENT.getUserData(that.getUserCallback);
 	},
 	
 	userTimelineCallback:function(data)
@@ -19,6 +20,10 @@ Gabulous = {
 	{
     console.log("in userFriendsCallback, data = ", data);
 	},
+  getUserCallback: function(data)
+  {
+    console.log("got the data for the logged in user = ", data);
+  }
 };
 
 Gabulous.init();

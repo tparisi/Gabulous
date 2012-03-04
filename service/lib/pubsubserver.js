@@ -6,8 +6,8 @@ function PubSubServerInstance() {
 
 PubSubServerInstance.prototype.attachToHttpServer = function(httpServer) {
     var me = this;
-    this.bayeux = new faye.NodeAdapter({mount: '/pubsub', timeout: 45, ping: 10});
-    /* Monitors, disable when not in use
+    this.bayeux = new faye.NodeAdapter({mount: '/gab', timeout: 45, ping: 10});
+    /* Monitors, disable when not in use */
     this.bayeux.bind('handshake', function(clientId) {
         me.handshakeMonitor(clientId);
     });
@@ -23,7 +23,6 @@ PubSubServerInstance.prototype.attachToHttpServer = function(httpServer) {
     this.bayeux.bind('publish', function(clientId, channel, data) {
         me.publishMonitor(clientId, channel, data);
     });
-    */
     this.bayeux.attach(httpServer);
     console.log('Attached');
 }

@@ -27,7 +27,7 @@ function init() {
     state.gabClient = new GabClient('johnmccutchan');
     state.gabClient.connect();
     state.client = new MyChatClient();
-    state.client.connect('http://localhost:8080/gab');
+    state.client.connect('http://10.104.86.106:8080/gab');
     state.client.subscribe('/chat');
 }
 

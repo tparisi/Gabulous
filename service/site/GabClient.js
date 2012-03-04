@@ -44,7 +44,7 @@ GabClient.prototype._messageListener = function(path, message) {
 
 GabClient.prototype.connect = function() {
     var me = this;
-    this.client = new Faye.Client('http://localhost:8080/gab');
+    this.client = new Faye.Client('http://10.104.86.106:8080/gab');
     this.client.connect(function() {
         me.connectListener();
     });

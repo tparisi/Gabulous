@@ -23,7 +23,7 @@ function Main() {
     twit.gabServer = GabServer.create();
     // Attach it to http server
     twit.gabServer.attachToHttpServer(twit.app);
-    twit.app.listen(8080, '127.0.0.1');
+    twit.app.listen(8080, '10.104.86.106');
     
     // Twitter authentication route
     twit.app.get('/auth/twitter',function(req,res){

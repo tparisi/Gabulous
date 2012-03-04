@@ -7,11 +7,11 @@ Gabulous = {
         SB.Graphics.instance.renderer.domElement.focus();
         game.run();
         this.postTweet();
-        this.populateTweetForm();
+        TWITTER_CLIENT.getUserData(this.populateTweetForm);
 	},
   populateTweetForm: function(data){
     $("#twitter_profile_pic").append("<img src="+data[0]["profile_image_url"]+" />");
-    $("#twitter_input").append("<h2>"+data[0]["name"]+"</h2>");
+    // $("#twitter_input").append("<h2>"+data[0]["name"]+"</h2>");
   },
   postTweet: function(){
     $("form#twitter_input_form").submit(function(){

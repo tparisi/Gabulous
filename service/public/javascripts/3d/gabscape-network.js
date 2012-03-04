@@ -679,6 +679,8 @@ Gabscape.prototype.help = function()
 }
 
 Gabscape.default_display_stats = false;
-Gabscape.users = ["tony", "john", "mark", "don", "theo"];
-Gabscape.user = "tony";
+Gabscape.users = ["auradeluxe", "carrnation", "cyberdino", "don_olmstead", "fromthought2web",
+                  "Gamepsych", "jackpryne", "JohnMcCutchan", "mgpettit", "scottfoe", "ta"];
+
+Gabscape.user = "auradeluxe";
 Gabscape.networkUpdateThreshold = 100;

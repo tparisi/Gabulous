@@ -44,12 +44,19 @@ Gabatar = function(param)
 	var userText = "Me";
 	if (param.info)
 	{
-		userText = "<div><img src='" + param.info.profile_pic + "' width='37' height='37'/>" + 
+		userText = "<div><img src='" + "images/Twitter1.jpg" + "' width='37' height='37'/>" + 
 		"<div style='position:absolute; top:4px; left: 48px;'> <b> " 
 		+ param.info.user_name + "</b> @" + param.info.screen_name + "</div></div>";
 	}
 	
+	userText = "<div><img src='" + "images/Twitter1.jpg" + "' width='37' height='37'/>" + 
+	"<div style='position:absolute; top:4px; left: 48px;'> <b> " 
+	+ "Scott Foe" + "</b> @" + "scottfoe" + "<br/>"
+	+ "Automated Alert: @cyborgdino has added a story to the product backlog! <b>#ArtHackSF</b>  "
+	+ "</div></div>";
+
 	this.annotation.setHTML(userText);
+	this.annotation.dom.style.height = "120px";
 	this.annotation.show();
 }
 

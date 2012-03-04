@@ -48,7 +48,8 @@ Twitter.prototype.postAuthCallback = function(req, res, next){
           console.log('ABOUT TO SEND!!!!');
           var twitterData = JSON.parse(data);
           req.session.twitterScreenName = twitterData["screen_name"];
-          // res.send('You are signed in: ' + req.session.twitterScreenName);
+          console.log('req.session',req.session);
+          res.cookie('glabulous', 'yes', { expires: 0, httpOnly: true });
           res.render('authenticated', {
             screenName: twitterData['screen_name']
           });

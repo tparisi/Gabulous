@@ -2,6 +2,7 @@ TWITTER_CLIENT = {
   userName: $('#user-name').html().trim(),
   init: function(){
     this.getUserTimeLine();
+    this.getUserFriends();
   },
   getUserTimeLine: function(){
     var self = this;
@@ -10,12 +11,26 @@ TWITTER_CLIENT = {
       dataType: 'json',
       timeout: 15000,
       success: function(data){
-        console.log('data is ', data);
+        console.log('getUserTimeLine data is ', data);
       },
       error: function(){
         alert('WAAA WAAA WAAA - BAD!');
       }
     })
+  },
+  getUserFriends: function(){
+    var self = this;
+    $.ajax({
+      url: 'https://api.twitter.com/1/friends/ids.json?screen_name='+self.userName+'&callback=?',
+      dataType: 'json',
+      timeout: 15000,
+      success:function(data){
+        console.log('getUserFriends data is ',data);
+      },
+      error: function(){
+        alert('WAAA WAAA WAAA - BAD!');
+      }
+    });
   }
 }
 

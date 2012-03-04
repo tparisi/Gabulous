@@ -12,7 +12,7 @@ Gabulous = {
 	
 	userFriendsCallback:function(data)
 	{
-		// console.log("in userFriendsCallback, data = ", data);
+    console.log("in userFriendsCallback, data = ", data);
 	},
 };
 

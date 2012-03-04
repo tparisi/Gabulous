@@ -9,6 +9,7 @@ Gabulous = {
 		TWITTER_CLIENT.getUserTimeLine(that.userTimelineCallback);
 		TWITTER_CLIENT.getUserFriends(that.userFriendsCallback);
     TWITTER_CLIENT.getUserData(that.getUserCallback);
+    TWITTER_CLIENT.getUserData(that.populateTweetForm);
 	},
 	
 	userTimelineCallback:function(data)
@@ -23,7 +24,12 @@ Gabulous = {
   getUserCallback: function(data)
   {
     console.log("got the data for the logged in user = ", data);
+  },
+  populateTweetForm: function(data){
+    $("#twitter_profile_pic").append("<img src="+data[0]["profile_image_url"]+" />");
+    $("#twitter_input").append("<h2>"+data[0]["name"]+"</h2>");
   }
+
 };
 
 Gabulous.init();

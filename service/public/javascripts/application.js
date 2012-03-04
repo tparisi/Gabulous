@@ -7,6 +7,7 @@ Gabulous = {
         SB.Graphics.instance.renderer.domElement.focus();
         game.run();
         this.postTweet();
+        this.populateTweetForm();
 	},
   populateTweetForm: function(data){
     $("#twitter_profile_pic").append("<img src="+data[0]["profile_image_url"]+" />");

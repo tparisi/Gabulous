@@ -45,7 +45,6 @@ Twitter.prototype.postAuthCallback = function(req, res, next){
         if (error) {
           res.send("Error getting twitter screen name : " + sys.inspect(error), 500);
         } else {
-          console.log('ABOUT TO SEND!!!!');
           var twitterData = JSON.parse(data);
           req.session.twitterScreenName = twitterData["screen_name"];
           console.log('req.session',req.session);
@@ -57,6 +56,15 @@ Twitter.prototype.postAuthCallback = function(req, res, next){
       });
     } 
   });
+};
+
+Twitter.prototype.getUserFriends = function(req,res){
+  console.log('inside server getUserFriends');
+
+  var jsonObj = {
+    'yada':'ohyes'
+  };
+  res.send(jsonObj);
 };
 
 module.exports = Twitter;

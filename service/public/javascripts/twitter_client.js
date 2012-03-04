@@ -4,7 +4,7 @@ TWITTER_CLIENT = {
     this.getUserTimeLine();
     this.getUserFriends();
   },
-  getUserTimeLine: function(){
+  getUserTimeLine: function(callback){
     var self = this;
     $.ajax({
       url: 'http://twitter.com/statuses/user_timeline/'+self.userName+'.json?callback=?',
@@ -12,6 +12,7 @@ TWITTER_CLIENT = {
       timeout: 15000,
       success: function(data){
         console.log('getUserTimeLine data is ', data);
+        callback(data);
       },
       error: function(){
         alert('WAAA WAAA WAAA - BAD!');

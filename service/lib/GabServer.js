@@ -1,10 +1,10 @@
 var http = require('http');
 var faye = require('faye');
 
-function PubSubServerInstance() {
+function GabServer() {
 }
 
-PubSubServerInstance.prototype.attachToHttpServer = function(httpServer) {
+GabServer.prototype.attachToHttpServer = function(httpServer) {
     var me = this;
     this.bayeux = new faye.NodeAdapter({mount: '/gab', timeout: 45, ping: 10});
     /* Monitors, disable when not in use */
@@ -24,29 +24,29 @@ PubSubServerInstance.prototype.attachToHttpServer = function(httpServer) {
         me.publishMonitor(clientId, channel, data);
     });
     this.bayeux.attach(httpServer);
-    console.log('Attached');
+    console.log('Faye Attached - GabServer running.');
 }
 
-PubSubServerInstance.prototype.publishMonitor = function(clientId, channel, data) {
+GabServer.prototype.publishMonitor = function(clientId, channel, data) {
     console.log('pss publish from %j on %j - %j', clientId, channel, data);
 }
 
-PubSubServerInstance.prototype.handshakeMonitor = function(clientId) {
+GabServer.prototype.handshakeMonitor = function(clientId) {
     console.log('pss handshake %j\n', clientId);
 }
 
-PubSubServerInstance.prototype.disconnectMonitor = function(clientId) {
+GabServer.prototype.disconnectMonitor = function(clientId) {
     console.log('pss disconnect %j\n', clientId);
 }
 
-PubSubServerInstance.prototype.subscribeMonitor = function(clientId,channel) {
+GabServer.prototype.subscribeMonitor = function(clientId,channel) {
     console.log('pss subscribe %j %j\n', clientId, channel);
 }
 
-PubSubServerInstance.prototype.unsubscribeMonitor = function(clientId,channel) {
+GabServer.prototype.unsubscribeMonitor = function(clientId,channel) {
     console.log('pss unsubscribe %j %j\n', clientId, channel);
 }
 
 exports.create = function() {
-    return new PubSubServerInstance();
+    return new GabServer();
 }

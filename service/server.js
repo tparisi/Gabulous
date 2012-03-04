@@ -7,7 +7,7 @@ var fs = require('fs');
 var faye = require('faye');
 var express = require('express');
 var WebSocket = require('faye-websocket');
-var PubSubServer = require('./lib/pubsubserver.js');
+var GabServer = require('./lib/GabServer.js');
 var Twitter= require('./lib/twitter.js');
 
 var twit = twit || {};
@@ -20,9 +20,9 @@ function Main() {
     twit.app.use(express.cookieParser()); 
     twit.app.use( express.session( { secret: 'whateva' } ) );
     // Create pub/sub server
-    twit.psServer = PubSubServer.create();
+    twit.gabServer = GabServer.create();
     // Attach it to http server
-    twit.psServer.attachToHttpServer(twit.app);
+    twit.gabServer.attachToHttpServer(twit.app);
     twit.app.listen(8080, '127.0.0.1');
     
     // Twitter authentication route

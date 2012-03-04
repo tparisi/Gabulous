@@ -280,6 +280,14 @@ Gabber.prototype.turn = function(direction)
 //	this.transform.rotation.y = delta; // += delta;
 }
 
+Gabber.prototype.setUserInfo = function(data) 
+{
+	var userText = "<div><img src='" + data.profile_image_url + "' width='37' height='37'/>" + 
+	"<div style='position:absolute; top:4px; left: 48px;'> <b> " 
+	+ data.name + "</b> @" + data.screen_name + "</div></div>";
+	this.annotation.setHTML(userText);
+}
+
 Gabber.prototype.onScreenPositionChanged = function(pos)
 {
 	this.annotation.setPosition(pos);

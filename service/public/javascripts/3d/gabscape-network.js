@@ -200,6 +200,38 @@ Gabscape.prototype.initSound = function()
 	sound_init();
 }
 
+Gabscape.prototype.getTwitterData = function()
+{
+	var that = this;
+
+	TWITTER_CLIENT.getUserData(function(data) { that.getUserCallback(data); });
+	TWITTER_CLIENT.getUserTimeLine(function(data) { that.userTimelineCallback(data); });
+	TWITTER_CLIENT.getUserFriends(function(data) { that.userFriendsCallback(data); });
+
+}
+
+Gabscape.prototype.getUserCallback = function(data)
+{
+	var userInfo = data[0];
+	this.gabatar.setUserInfo(userInfo);
+}
+
+Gabscape.prototype.userTimelineCallback = function(data)
+{
+	var foo = data;
+}
+
+Gabscape.prototype.userFriendsCallback = function(data)
+{
+	var i, len = data.length;
+	for (i = 0; i < len; i++)
+	{
+		if (i >= this.gabbers.length)
+			break;
+		
+		this.gabbers[i].setUserInfo(data[i]);
+	}
+}
 Gabscape.prototype.selfSpawnEvent = function(twitterId, message) {
     var x = message.spawnposition.x;
     var y = message.spawnposition.y;

@@ -1,8 +1,13 @@
 TWITTER_CLIENT = {
   userName: $('#user-name').html().trim(),
+  productionUrl: 'http://localhost:8080',
+  idCollection: null,
+  userCollection: [],
   init: function(){
-    this.getUserTimeLine();
-    this.getUserFriends();
+    if(this.userName){
+      this.getUserTimeLine();
+      this.getUserFriends();
+    }
   },
   getUserTimeLine: function(callback){
     var self = this;
@@ -11,7 +16,6 @@ TWITTER_CLIENT = {
       dataType: 'json',
       timeout: 15000,
       success: function(data){
-        console.log('getUserTimeLine data is ', data);
         callback(data);
       },
       error: function(){
@@ -24,13 +28,27 @@ TWITTER_CLIENT = {
     $.ajax({
       url: 'https://api.twitter.com/1/friends/ids.json?screen_name='+self.userName+'&callback=?',
       dataType: 'json',
-      timeout: 15000,
       success:function(data){
-        console.log('getUserFriends data is ',data);
+        self._returnUserJSON(data['ids'].slice(0,100),callback);
+      },
+      error: function(error){
+    	  console.log('getUserFriends error: ',error);
+      }
+    });
+  },
+  // Private
+  _returnUserJSON: function(dataIds,callback){
+    var commaDelimitedIds = dataIds.join(',');  
+    var self = this;
+    $.ajax({
+      url: 'https://api.twitter.com/1/users/lookup.json?user_id='+commaDelimitedIds+'&callback=?',
+      dataType: 'json',
+      type: 'POST',
+      success: function(data){
         callback(data);
       },
-      error: function(){
-    	  console.log('getUserFriends error');
+      error: function(error){
+        console.log('suuuuuuucks!');
       }
     });
   }

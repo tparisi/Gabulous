@@ -20,8 +20,6 @@ Gabscape.prototype.initialize = function(param)
 	this.twitterInfo = param.info;
 	
 	SB.Game.prototype.initialize.call(this, param);
-
-	this.getTwitterData();
 }
 
 
@@ -57,6 +55,8 @@ Gabscape.prototype.initEntities = function()
 	this.initModels();
 
     this.gabbers = [];
+    var degs = Math.PI * 2 / Gabscape.users.length;
+    var radius = 10;
     var i;
     for (i = 0; i < Gabscape.users.length; i++) {
         if (Gabscape.users[i] == Gabscape.user) {
@@ -68,7 +68,7 @@ Gabscape.prototype.initEntities = function()
         g1.network = g1.network || {};
         g1.network.orientationInterpolationTime = 0.0;
         g1.network.positionInterpolationTime = 0.0;
-        g1.transform.position.set(0, 0, 0);
+        g1.transform.position.set(Math.sin(degs * i) * radius, 0, Math.cos(degs * i) * radius);
         this.gabbers.push(g1);
     }
 
@@ -91,6 +91,9 @@ Gabscape.prototype.initEntities = function()
 	this.viewer.viewpoint.camera.bind();
 	
 	this.initSound();
+
+	this.getTwitterData();
+
 }
 
 Gabscape.prototype.createViewer = function()

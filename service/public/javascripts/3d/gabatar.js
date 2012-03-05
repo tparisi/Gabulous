@@ -40,7 +40,7 @@ Gabatar = function(param)
 
 	this.screenTracker.subscribe("position", this, this.onScreenPositionChanged);
 
-	this.annotation = new SB.Annotation( { style : "text500" } );
+	this.annotation = new SB.Annotation( { style : "text200" } );
 	var userText = "Me";
 	if (param.info)
 	{
@@ -56,7 +56,8 @@ Gabatar = function(param)
 	+ "</div></div>";
 
 	this.annotation.setHTML(userText);
-	this.annotation.dom.style.height = "120px";
+//	this.annotation.dom.style.height = "120px";
+//	this.annotation.dom.style.width = "300px";
 	this.annotation.show();
 }
 
@@ -72,7 +73,8 @@ Gabatar.prototype.setUserInfo = function(data)
 {
 	var userText = "<div><img src='" + data.profile_image_url + "' width='37' height='37'/>" + 
 	"<div style='position:absolute; top:4px; left: 48px;'> <b> " 
-	+ data.name + "</b> @" + data.screen_name + "</div></div>";
+	+ data.name + "</b> @" + data.screen_name + "<br>" +
+	data.status.text + "</div></div>";
 	this.annotation.setHTML(userText);
 }
 

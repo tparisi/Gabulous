@@ -13,8 +13,8 @@ TWITTER_CLIENT = {
       success: function(data){
         callback(data);
       },
-      error: function(){
-
+      error: function(error){
+    	  console.log('getUserData error', error);
       }
     });
   },
@@ -27,8 +27,8 @@ TWITTER_CLIENT = {
       success: function(data){
         callback(data);
       },
-      error: function(){
-    	  console.log('getUserTimeLine error');
+      error: function(error){
+    	  console.log('getUserTimeLine error: ', error);
       }
     })
   },
@@ -41,7 +41,7 @@ TWITTER_CLIENT = {
         self._returnUserJSON(data['ids'].slice(0,100),callback);
       },
       error: function(error){
-    	  console.log('getUserFriends error: ',error);
+    	  console.log('getUserFriends error: ', error);
       }
     });
   },

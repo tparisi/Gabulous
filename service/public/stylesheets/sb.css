@@ -51,8 +51,9 @@
 
 .annotation {
     position: absolute;
-    height: 40px;
-    width: 200px;
+    font-family:Verdana;
+    height: 60px;
+    width: 180px;
     top:    200px;
     left:    200px;
     
@@ -84,19 +85,19 @@
 }
 
 .text300 {
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .text400 {
-    font-size: 13px;
-}
-
-.text500 {
     font-size: 14px;
 }
 
+.text500 {
+    font-size: 16px;
+}
+
 .text600 {
-    font-size: 18px;
+    font-size: 24px;
 }
 
 .text700 {

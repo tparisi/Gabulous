@@ -53,6 +53,7 @@ Gabscape.prototype.initEntities = function()
 	this.timer.start();
 	
 	this.initModels();
+	this.initAnimations();
 
     this.gabbers = [];
     var degs = Math.PI * 2 / Gabscape.users.length;
@@ -147,15 +148,16 @@ Gabscape.prototype.initModels = function()
 	  this.initModel(modelpath + 'trees_conf01_rescaled.js', 5, 0, 15, -3 );
 	  this.initModel(modelpath + 'trees_conf01_rescaled.js', -5, 0, -15, -4 );  
 	  
-		this.initModel(modelpath + 'cloud01_rescaled.js', -20, 8, -20, 1 );
-	  this.initModel(modelpath + 'cloud01_rescaled.js', 20, 9, -20, 2 );
-	  this.initModel(modelpath + 'cloud01_rescaled.js', -20, 10, 20, 3 );
-	  this.initModel(modelpath + 'cloud01_rescaled.js', 20, 11, 20, 4 );
+	  this.clouds = [];
+	  this.clouds.push(this.initModel(modelpath + 'cloud01_rescaled.js', -20, 8, -20, 1 ));
+	  this.clouds.push(this.initModel(modelpath + 'cloud01_rescaled.js', 20, 9, -20, 2 ));
+	  this.clouds.push(this.initModel(modelpath + 'cloud01_rescaled.js', -20, 10, 20, 3 ));
+	  this.clouds.push(this.initModel(modelpath + 'cloud01_rescaled.js', 20, 11, 20, 4 ));
 	  
-	  this.initModel(modelpath + 'cloud01_rescaled.js', 15, 8, 0, -1 );
-	  this.initModel(modelpath + 'cloud01_rescaled.js', -15, 9, 0, -2 );
-	  this.initModel(modelpath + 'cloud01_rescaled.js', 0, 10, 16, -3 );
-	  this.initModel(modelpath + 'cloud01_rescaled.js', 0, 11, -16, -4 );
+	  this.clouds.push(this.initModel(modelpath + 'cloud01_rescaled.js', 15, 8, 0, -1 ));
+	  this.clouds.push(this.initModel(modelpath + 'cloud01_rescaled.js', -15, 9, 0, -2 ));
+	  this.clouds.push(this.initModel(modelpath + 'cloud01_rescaled.js', 0, 10, 16, -3 ));
+	  this.clouds.push(this.initModel(modelpath + 'cloud01_rescaled.js', 0, 11, -16, -4 ));
 	  
 		this.initModel(modelpath + 'mountan01.js', -48, 0, 0, 1 );
 	  this.initModel(modelpath + 'mountan01.js', 49, 0, -0, 2 );
@@ -180,7 +182,7 @@ Gabscape.prototype.initModel = function(url, x, y, z, ry)
 	   transform.position.x = x;
 	   transform.position.y = y;
 	   transform.position.z = z;
-     transform.rotation.y = ry;
+       transform.rotation.y = ry;
 	   entity.addComponent(transform);
 	   entity.transform = transform;
 
@@ -195,9 +197,34 @@ Gabscape.prototype.initModel = function(url, x, y, z, ry)
        var model = SB.Model.loadModel(url, params);
        entity.addComponent(model);
 
-       entity.realize();
+       this.root.addChild(entity);
+       
+       return entity;
+}
 
-       this.addEntity(entity);
+Gabscape.prototype.initAnimations = function()
+{
+	var i, len = this.clouds.length;
+	
+	for (i = 0; i < len; i++)
+	{
+		var cloud = this.clouds[i];
+		var keys = [0, .5, 1];
+		var values = [{ x : cloud.transform.position.x },
+		              { x : cloud.transform.position.x - 100 * (1 + Math.random())},
+		              { x : cloud.transform.position.x },]
+	    var animator = new SB.KeyFrameAnimator({ 
+	    	interps:
+	    		[ 
+	    	    { keys:keys, values:values, target:cloud.transform.position},
+	    		],
+	    	loop: true,
+	    	duration:3000000
+	    });
+	    
+	    cloud.addComponent(animator);	
+	    animator.start();
+	}
 }
 
 Gabscape.prototype.initSound = function()
@@ -207,6 +234,8 @@ Gabscape.prototype.initSound = function()
 
 Gabscape.prototype.getTwitterData = function()
 {
+	return;
+	
 	var that = this;
 
 	TWITTER_CLIENT.getUserData(function(data) { that.getUserCallback(data); });
@@ -598,6 +627,12 @@ Gabscape.prototype.onTimeChanged = function(t)
 		    		break;
 			}
 		}
+		
+		if (!handled)
+		{
+			if (gain2.gain.value)
+				gain2.gain.value = 0;
+		}
 	}
 	this.updateNetworkPositions(t);
 	this.updateNetwork(t);
@@ -613,7 +648,8 @@ Gabscape.prototype.move = function(direction)
 	var delta = direction * .1666;
 	var dir = new THREE.Vector3(0, 0, delta);
 	this.viewer.move(dir);
-	gain2.gain.value = 1;
+	//if (!gain2.gain.value)
+		//gain2.gain.value = 1;
 }
 
 Gabscape.prototype.turn = function(direction)

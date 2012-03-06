@@ -17,12 +17,11 @@ Gabber = function(param)
     var url = '../../models/body_hero_nopane.js';
     this.body = SB.Model.loadModel(url, params);
 	url = '../../models/avatar_display.js';
-    this.display = new SB.CubeVisual({width:.444, height:.444, depth:.1, color:0x000000});
+    this.display = new SB.CubeVisual({width:.444, height:.444, depth:.1, color:0xFFFFFF,
+    	map:new THREE.Texture(new Image())});
     this.display.position.y = 2.62;
     url = '../../models/avatar_frame.js';
     this.displayFrame = SB.Model.loadModel(url, params);
-
-    this.profileMap = THREE.ImageUtils.loadTexture( "./images/Twitter1.jpg" )
 
 	this.picker = new SB.Picker();
 	this.rotator = new SB.Rotator();
@@ -288,21 +287,23 @@ Gabber.prototype.turn = function(direction)
 
 Gabber.prototype.setUserInfo = function(data) 
 {
-	var userText = "<div>" + "<img src='" + data.profile_image_url + "'>" +
-	"<div style='position:absolute; top:4px; left: 48px;'> <b> " 
+	var userText = "<div>" + // "<img src='" + data.profile_image_url + "'>" +
+	"<div style='position:absolute; top:4px; padding: 4px;'> <b> " 
 	+ data.name + "</b> @" + data.screen_name + "<br>" +
 	(data.status ? data.status.text : "") + "</div></div>";
 	this.annotation.setHTML(userText);
-//	this.display.object.material.map = THREE.ImageUtils.loadTexture(data.profile_image_url);
-
-	var image = new Image();
-	image.crossOrigin = "use-credentials";
-	var that = this;
-	image.onload = function () { 
-//		that.display.object.material.color.setRGB(1, 0, 0);
-		that.display.object.material.map = new THREE.Texture(image); 
-		};
-	image.src = data.profile_image_url;
+	if (data.profile_image_url)
+	{
+		var url = Gabscape.makeProxyUrl(data.profile_image_url);
+		var image = new Image();
+		var that = this;
+		image.onload = function () { 
+			// UGH, this blows
+			that.display.object.material.map.image = image; 
+			that.display.object.material.map.needsUpdate = true; 
+			};
+		image.src = url;
+	}
 }
 
 Gabber.prototype.onScreenPositionChanged = function(pos)

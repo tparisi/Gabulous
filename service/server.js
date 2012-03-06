@@ -9,9 +9,11 @@ var express = require('express');
 var WebSocket = require('faye-websocket');
 var GabServer = require('./lib/GabServer.js');
 var Twitter= require('./lib/twitter.js');
+var Proxy = require('./lib/proxy.js');
 
 var twit = twit || {};
 var twitter = new Twitter(); 
+var proxy = new Proxy();
 
 // Main:
 function Main() {
@@ -20,16 +22,27 @@ function Main() {
     twit.app.use(express.cookieParser()); 
     twit.app.use( express.session( { secret: 'whateva' } ) );
 
-    twit.app.configure(function(){
+    var allowCrossDomain = function(req, res, next) {
+    	console.log("Applying allowCrossDomain to", req.url);
+        res.header('Access-Control-Allow-Origin', "*");
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+        res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+        next();
+    }
+    
+      twit.app.configure(function(){
       twit.app.set('views', __dirname + '/views');
       twit.app.set('view engine', 'jade');
       twit.app.use(express.bodyParser());
       twit.app.use(express.methodOverride());
       twit.app.use(require('stylus').middleware({ src: __dirname + '/public' }));
+//      twit.app.use(allowCrossDomain);
       twit.app.use(twit.app.router);
       twit.app.use(express.static(__dirname + '/public'));
     });
 
+    
     // Create pub/sub server
     twit.gabServer = GabServer.create();
     // Attach it to http server
@@ -47,7 +60,7 @@ function Main() {
         });
       } else {
         res.render('index', {
-          title: 'Welcome to Glabulous!'
+          title: 'Welcome to Gabulous!'
         });
       }
      });
@@ -67,6 +80,12 @@ function Main() {
       twitter.postAuthCallback(req, res, next);  
     });
 
+    // Twitter authentication callback
+    twit.app.get('/proxy',function(req, res, next){
+    	console.log("in proxy url");
+      proxy.get(req, res);  
+    });
+    
 }
 
 Main();

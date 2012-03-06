@@ -234,8 +234,6 @@ Gabscape.prototype.initSound = function()
 
 Gabscape.prototype.getTwitterData = function()
 {
-	return;
-	
 	var that = this;
 
 	TWITTER_CLIENT.getUserData(function(data) { that.getUserCallback(data); });
@@ -682,6 +680,12 @@ Gabscape.prototype.help = function()
 	this.helpScreen.show();
 }
 
+Gabscape.makeProxyUrl = function(url)
+{
+	return Gabscape.PROXY_ROOT + "?src=" + url;
+}
+
+Gabscape.PROXY_ROOT = "/proxy";
 Gabscape.default_display_stats = false;
 Gabscape.users = ["auradeluxe", "carrnation", "cyberdino", "don_olmstead", "fromthought2web",
                   "Gamepsych", "jackpryne", "JohnMcCutchan", "mgpettit", "scottfoe", "ta"];

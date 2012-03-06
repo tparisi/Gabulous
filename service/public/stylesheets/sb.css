@@ -70,6 +70,7 @@
     border-radius: 3px;
     
     display:none;
+    overflow:hidden;
 }
 
 .handwritten {

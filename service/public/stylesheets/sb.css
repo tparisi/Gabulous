@@ -50,8 +50,8 @@
 }
 
 .annotation {
+	font-family:Verdana;
     position: absolute;
-    font-family:Verdana;
     height: 60px;
     width: 180px;
     top:    200px;
@@ -94,11 +94,11 @@
 }
 
 .text500 {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .text600 {
-    font-size: 24px;
+    font-size: 18px;
 }
 
 .text700 {

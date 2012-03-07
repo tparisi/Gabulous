@@ -2,15 +2,19 @@ var OAuth= require('oauth').OAuth;
 var url  = require('url');
 var http = require('http');
 var twtr = require('twitter');
-var https = require('https')
+var https = require('https');
 var oa;
 var _twitterConsumerKey = 'SICgH4FUlyrkEBlm1uMYQ';
 var _twitterConsumerSecret = 'BEB1iJAWNWtHzaYAnGZE6Ploo4512CzUocdxkFSSt8'; 
+var twitterCache = require('./twitterCache.js');
 
 function Twitter(){
   if(!(this instanceof arguments.callee)){
     return new arguments.callee(arguments);
-  } 
+  }
+  
+  console.log("Initializing Twitter data cache");
+  this.twitterCache = twitterCache.createCache();
 }
 
 Twitter.prototype.authenticate = function(req,res){
@@ -67,44 +71,11 @@ Twitter.prototype.getUserFriends = function(req,res){
   var url_parts = url.parse(req.url, true);
   var query = url_parts.query;
   var screenName = query['screen_name'];
-  var friends = [];
-  
-  var options = {
-      host: 'api.twitter.com',
-      path: '/1/friends/ids.json?screen_name=fromthought2web',
-      // port : '443',
-      method: 'GET'
-  };
-
-  console.log('about to call twitter api');
-
-  var req = https.request(options, function(res) {
-      console.log('---- inside request ----');
-      // console.log('STATUS: ' + res.statusCode);
-      // res.setEncoding('utf8');
-      // res.on('data', function (chunk) {
-      //     console.log('BODY: ' + chunk);
-      // });
-  });
-  
-
-
-  // var twit = new twtr({
-  //     consumer_key: _twitterConsumerKey,
-  //     consumer_secret: _twitterConsumerSecret,
-  //     access_token_key: req.session.oauthAccessToken,
-  //     access_token_secret: req.session.oauthAccessTokenSecret  
-  // });
-   
-  // // console.log('twit',twit);
-  
-  // twit.get('https://api.twitter.com/1/friends/ids.json?screen_name=fromthought2web', {callback: "&#063;"}, function(data) {
-  //     // sys.puts(sys.inspect(data));
-  //   console.log('data after twit.get',data);
-  // });
-  
-
-  res.send(friends);
+  var friends = this.twitterCache.getUserFriends(screenName,
+		  function(friends) {
+	  		console.log("In the Twitter object callback, friends = ", friends);
+	  		res.send(friends);
+  			});
 };
 
 module.exports = Twitter;

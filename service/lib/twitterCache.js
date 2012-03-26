@@ -116,15 +116,15 @@ TwitterUserPersist.prototype.fetchUserFriends = function(callback){
 TwitterUserPersist.prototype.fetchUserFriendsData = function(commaDelimitedIds, callback){
 	  
 	  console.log('inside TwitterUserPersist.fetchUserFriendsData');
-	  callback(commaDelimitedIds);
-	  
-	  return;
+	  console.log('commaDelimitedIds are', commaDelimitedIds);
+	  var ids = JSON.parse(commaDelimitedIds).ids;
+	  console.log('IDs are', ids ? ids.join(",") : "NULL!!!!");
 	  
 	  var friends = "";
 	  
 	  var options = {
 	      host: 'api.twitter.com',
-	      path: '/1/users/lookup.json?user_id=' + commaDelimitedIds,
+	      path: '/1/users/lookup.json?user_id=' + ids,
 	      method: 'GET'
 	  };
 
@@ -141,7 +141,20 @@ TwitterUserPersist.prototype.fetchUserFriendsData = function(commaDelimitedIds, 
         res.on('end', function() {
       	    this.userFriends = friends;
             console.log("USER FRIENDS DATA SUCCESS!");
+            if (callback)
+            {
+            	callback(friends);
+            }
         });
+        res.on('error', function() {
+      	    this.userFriends = null;
+            console.log("USER FRIENDS DATA SUCCESS!");
+            if (callback)
+            {
+            	callback(null);
+            }
+	  });	  
+
 	  });	  
 }
 

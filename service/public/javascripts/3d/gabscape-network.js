@@ -646,8 +646,8 @@ Gabscape.prototype.move = function(direction)
 	var delta = direction * .1666;
 	var dir = new THREE.Vector3(0, 0, delta);
 	this.viewer.move(dir);
-	//if (!gain2.gain.value)
-		//gain2.gain.value = 1;
+	if (!gain2.gain.value)
+		gain2.gain.value = 1;
 }
 
 Gabscape.prototype.turn = function(direction)

@@ -21,10 +21,10 @@ Proxy.prototype.get = function(proxyReq,proxyRes){
         method : "GET"
     };
 
-    console.log("Request options: ", reqOptions);
+//    console.log("Request options: ", reqOptions);
     
     var req = http.request(reqOptions, function(res) {
-        console.log("In the callback...");
+//        console.log("In the callback...");
         var headers = res.headers;
         headers['Access-Control-Allow-Origin'] = '*';
         headers['Access-Control-Allow-Headers'] = 'X-Requested-With';
@@ -32,12 +32,12 @@ Proxy.prototype.get = function(proxyReq,proxyRes){
 
         res.on('data', function(chunk) {
         	proxyRes.write(chunk);
-            console.log("writing data...");
+//            console.log("writing data...");
         });
 
         res.on('end', function() {
         	proxyRes.end();
-            console.log("Proxy Success!");
+//            console.log("Proxy Success!");
         });
     });
 

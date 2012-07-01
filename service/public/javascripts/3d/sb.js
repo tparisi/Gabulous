@@ -1666,7 +1666,6 @@ SB.Input.instance = null;/**
  * @fileoverview Main interface to the graphics and rendering subsystem
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Time');
 
@@ -1695,8 +1694,8 @@ SB.Time.prototype.update = function()
 SB.Time.instance = null;
 	        
 /**
- * @fileoverview Contains configuration options for the Forbidden Engine.
- * @author Don Olmstead
+ * @fileoverview Contains configuration options for the Skybox Engine.
+ * @author Tony Parisi
  */
 goog.provide('SB.Config');
 
@@ -1708,7 +1707,6 @@ SB.Config.USE_WEBGL = true;
  * @fileoverview Main interface to the graphics and rendering subsystem
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Graphics');
 
@@ -1728,7 +1726,6 @@ SB.Graphics.instance = null;
  * @fileoverview Main interface to the graphics and rendering subsystem
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.require('SB.Graphics');
 goog.provide('SB.GraphicsThreeJS');
@@ -2129,7 +2126,6 @@ SB.Services.registerService = function(serviceName, object)
  * @fileoverview The base Game class
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Game');
 goog.require('SB.Time');
@@ -2449,7 +2445,6 @@ SB.PubSub.postMessages = false;
  * @fileoverview Component is the base class for defining objects used within an Entity
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Component');
 goog.require('SB.PubSub');
@@ -2959,6 +2954,14 @@ SB.Model.prototype.animate  = function(animating)
 	}
 }
 
+SB.Model.prototype.applyShader = function(shaderClass)
+{
+	if (this.object && this.object.geometry && shaderClass && shaderClass.applyShader)
+	{
+		shaderClass.applyShader(this.object);
+	}
+}
+
 SB.Model.default_frame_rate = 30;
 
 SB.Model.loadModel = function(url, param, callback)
@@ -3005,7 +3008,7 @@ SB.Model.loadModel = function(url, param, callback)
 			model.handleLoaded(data);
 			if (callback)
 			{
-				callback(data);
+				callback(model);
 			}
 		});
 		
@@ -3255,7 +3258,6 @@ SB.PhysicsSystemBox2D.prototype.addBody = function(body) {
  * @fileoverview Entity collects a group of Components that define a game object and its behaviors
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 goog.provide('SB.Entity');
 goog.require('SB.PubSub');
@@ -4163,9 +4165,41 @@ SB.Shaders.ToonShader = function(diffuseUrl, toonUrl, ambient, diffuse)
 	
 	return params;
 } ;
+
+
+SB.Shaders.ToonShader.applyShader = function(object)
+{
+	var geometry = object.geometry;
+	var material = object.material;
+	
+	if (material instanceof THREE.MeshFaceMaterial)
+	{
+		// HACK FOR TOON SHADING REMOVE
+		var diffuseTexture = './images/diffuse-tree.png';
+		var toonTexture = './images/toon-lookup.png';
+		
+		for (var i = 0; i < geometry.materials.length; i++)
+		{
+			var oldMaterial = geometry.materials[i];
+			
+			var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+			
+			geometry.materials[i] = new THREE.ShaderMaterial(newMaterialParams);
+		}
+	}
+	else
+	{
+		var oldMaterial = material;
+		
+		var newMaterialParams = SB.Shaders.ToonShader(diffuseTexture, toonTexture, oldMaterial.ambient, oldMaterial.color);
+		
+		object.material = new THREE.ShaderMaterial(newMaterialParams);
+	}
+}
+
 /**
  * @fileoverview A visual containing a model in JSON format
- * @author Don Olmstead
+ * @author Tony Parisi
  */
 goog.provide('SB.JsonModel');
 goog.require('SB.Model');
@@ -4201,7 +4235,7 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 		material = SB.Visual.realizeMaterial(this.param);
 	}
 
-	if (true)
+	if (false)
 	{
 		// HACK FOR TOON SHADING REMOVE
 		var diffuseTexture = './images/diffuse-tree.png';
@@ -4218,9 +4252,10 @@ SB.JsonModel.prototype.handleLoaded = function(data)
 	}
 	
 	this.object = new THREE.Mesh(data, material);
-	
+
 	this.addToScene();
 }
+
 /**
  * @fileoverview Timer - component that generates time events
  * 
@@ -4276,7 +4311,7 @@ SB.Timer.prototype.stop = function()
 
 /**
  * @fileoverview A visual containing a cylinder mesh.
- * @author Don Olmstead
+ * @author Tony Parisi
  */
 goog.provide('SB.CylinderVisual');
 goog.require('SB.Visual');
@@ -4310,11 +4345,11 @@ SB.CylinderVisual.prototype.realize = function()
     var segmentsRadius = this.param.segmentsRadius || 100;
     var segmentsHeight = this.param.segmentsHeight || 100;
     var openEnded = this.param.openEnded || false;
-    
+    var color = this.param.color || 0xFFFFFF;
     var ambient = this.param.ambient || 0;
     
 	var geometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, segmentsRadius, segmentsHeight, openEnded);
-	this.object = new THREE.Mesh(geometry, SB.Visual.realizeMaterial(this.param));
+	this.object = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color : color }));
 	
     this.addToScene();
 }
@@ -4322,7 +4357,6 @@ SB.CylinderVisual.prototype.realize = function()
  * @fileoverview FSM - Finite State Machine class
  * 
  * @author Tony Parisi
- * @author Don Olmstead
  */
 
 goog.provide('SB.FSM');
@@ -4768,7 +4802,7 @@ SB.KeyFrameAnimator.prototype.update = function()
 SB.KeyFrameAnimator.default_duration = 1000;
 /**
  * @fileoverview A visual containing a cylinder mesh.
- * @author Don Olmstead
+ * @author Tony Parisi
  */
 goog.provide('SB.CubeVisual');
 goog.require('SB.Visual');
